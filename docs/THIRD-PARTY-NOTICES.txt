@@ -1,0 +1,9 @@
+Clear Read - Third-Party Runtime Notice
+
+The locally prepared development build includes Tesseract OCR 5.5.3.20260724, tessdata_fast Arabic/English/French/orientation models, and Poppler 26.09.0. Tesseract binaries come from https://github.com/tesseract-ocr/tesseract/releases/tag/5.5.3; models come from https://github.com/tesseract-ocr/tessdata_fast; Windows Poppler binaries come from https://github.com/oschwartz10612/poppler-windows/releases/tag/v26.09.0-0.
+
+Tesseract and tessdata model licenses and authorship notices are in licenses/tesseract. Poppler COPYING notices are in licenses/poppler. Bundled native libraries have additional licensing obligations; this notice is not a completed redistribution audit. Runtime binaries are generated local artifacts excluded from source control.
+
+Image preprocessing uses the portable ImageMagick 7.1.2-33 Q8 x64 build from https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.2-33. Its LICENSE.txt and NOTICE.txt are included under licenses/imagemagick. The portable build's native delegates are described in its notices.
+
+Before a public binary release, verify the exact versions and licenses of every bundled dependency and copy their required notices into the installed application.

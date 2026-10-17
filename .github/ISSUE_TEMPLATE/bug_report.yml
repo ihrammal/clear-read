@@ -1,0 +1,58 @@
+name: Report a problem
+description: Tell us what happened in Clear Read.
+title: "[Problem] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You can also use Help > Report a Problem inside Clear Read.
+        Include only sample text you are allowed to share. Do not post passwords, API keys or private documents.
+        For a security concern, email iman.rammal@gmail.com instead of posting details publicly.
+  - type: input
+    id: version
+    attributes:
+      label: Clear Read version
+      description: Find this under Help > About Clear Read.
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11, 64-bit
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Recognition language
+      options:
+        - Arabic
+        - English
+        - French
+        - Mixed languages / Automatic
+        - Not related to recognition
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened?
+      description: Describe the problem and any error message.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the keys, menu choices or actions used.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: input
+    id: assistive_technology
+    attributes:
+      label: Screen reader or other accessibility tools, if relevant
+      placeholder: NVDA version, magnification, high contrast, keyboard layout

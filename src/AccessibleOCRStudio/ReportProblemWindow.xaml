@@ -1,0 +1,18 @@
+<Window x:Class="AccessibleOCRStudio.ReportProblemWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Report a Problem — Clear Read" Width="760" Height="720" MinWidth="360" MinHeight="360" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Closing="Window_Closing">
+<Grid Margin="16"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel>
+<TextBlock Text="Report a Problem" FontSize="20" FontWeight="SemiBold"/>
+<TextBlock Margin="0,8" TextWrapping="Wrap" Text="Describe the issue below, then review the report. Email opens a draft to iman.rammal@gmail.com in your email application; you decide whether to send it. Save and Copy work without email. Do not enter passwords or private document content."/>
+<TextBlock x:Name="GitHubAvailability" TextWrapping="Wrap" Margin="0,0,0,8"/>
+<Label Content="_Summary (required)" Target="{Binding ElementName=Summary}"/><TextBox x:Name="Summary" AutomationProperties.Name="Problem summary, required"/>
+<Label Content="Steps to _reproduce" Target="{Binding ElementName=Steps}"/><TextBox x:Name="Steps" AcceptsReturn="True" AcceptsTab="False" TextWrapping="Wrap" MinHeight="70" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Steps to reproduce"/>
+<Label Content="Expected _behavior" Target="{Binding ElementName=Expected}"/><TextBox x:Name="Expected" AcceptsReturn="True" AcceptsTab="False" TextWrapping="Wrap" MinHeight="55" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Expected behavior"/>
+<Label Content="_Actual behavior (required)" Target="{Binding ElementName=Actual}"/><TextBox x:Name="Actual" AcceptsReturn="True" AcceptsTab="False" TextWrapping="Wrap" MinHeight="70" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Actual behavior, required"/>
+<CheckBox x:Name="IncludeDiagnostics" Content="Include basic technical details (Windows, .NET and OCR availability)" IsChecked="False" Margin="0,12"/>
+<TextBlock TextWrapping="Wrap" Text="Diagnostics do not attach documents, file paths, API keys or logs. Only text you enter and the report preview are shared."/>
+<Label Content="Report _preview" Target="{Binding ElementName=ReportPreview}"/><TextBox x:Name="ReportPreview" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="False" Height="160" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Problem report preview"/>
+</StackPanel></ScrollViewer>
+<TextBlock Grid.Row="1" x:Name="ReportStatus" Text="Complete the summary and actual behavior to enable report actions." TextWrapping="Wrap" Margin="0,10" Focusable="True" AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite"/>
+<WrapPanel Grid.Row="2" HorizontalAlignment="Right"><Button x:Name="GitHubReport" Content="Report on _GitHub..." MinWidth="145" Margin="4" Click="GitHub_Click" ToolTipService.ShowOnDisabled="True"/><Button x:Name="EmailReport" Content="_Email report..." MinWidth="115" Margin="4" Click="Email_Click"/><Button x:Name="SaveReport" Content="Sa_ve report..." MinWidth="115" Margin="4" Click="Save_Click" IsDefault="True"/><Button x:Name="CopyReport" Content="_Copy report" MinWidth="110" Margin="4" Click="Copy_Click"/><Button Content="Cl_ose" MinWidth="90" Margin="4" IsCancel="True"/></WrapPanel>
+</Grid></Window>
+

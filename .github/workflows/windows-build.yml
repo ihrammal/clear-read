@@ -1,0 +1,48 @@
+name: Windows build validation
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, 'codex/release-*' ]
+  pull_request:
+    branches: [ main, 'codex/release-*' ]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Validate source
+        shell: pwsh
+        run: ./scripts/validate-source.ps1
+      - name: Report source version
+        shell: pwsh
+        run: |
+          [xml]$csproj = Get-Content ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj
+          Write-Host "Building Clear Read $($csproj.Project.PropertyGroup.Version)"
+      - name: Restore and build
+        shell: pwsh
+        run: dotnet build ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj -c Release
+      - name: Prepare offline OCR runtime
+        shell: pwsh
+        run: ./scripts/setup-runtime.ps1
+      - name: Run functional tests
+        shell: pwsh
+        run: ./scripts/test-windows.ps1
+      - name: Publish win-x64
+        shell: pwsh
+        run: ./scripts/build-windows.ps1
+      - name: Build and verify installer on fresh runner
+        shell: pwsh
+        run: |
+          ./scripts/build-installer.ps1
+          ./scripts/test-installer.ps1 -ProductionPackage -SkipLaunch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClearRead-win-x64
+          path: |
+            publish/
+            artifacts/installer-verification-ci.txt
