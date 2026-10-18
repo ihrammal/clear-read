@@ -30,9 +30,9 @@ packages the complete publish folder, including offline language models.
   pass. Keep the entire publish folder together for portable execution.
 - Code signing remains outstanding. Do not advertise the package as signed.
 
-The repository remains empty and private. No source or binary upload has occurred. Keep it private during preparation; when the approved release is published, make the repository public so users can download the app and submit issues.
+The repository is public at https://github.com/ihrammal/clear-read with Issues enabled. The reviewed source is committed on `main`; publish, runtime, .tools, artifacts, bin and obj are excluded by `.gitignore`.
 
 ## Latest preparation — 18 October 2026
 
-See QA-STATUS-2026-10-18.md. The owner selected an unsigned preview; trusted signing is not required for that preview and must not be claimed. Native redistribution, clean-machine and remaining accessibility checks are open. The GitHub connector could not access ihrammal/clear-read (API 422); no upload or visibility change was attempted. Run scripts/verify-release-artifacts.ps1 before uploading the prepared assets.
+See QA-STATUS-2026-10-18.md. The owner selected an unsigned preview; trusted signing is not required for that preview and must not be claimed. Native redistribution, clean-machine and remaining accessibility checks are open. Publication is complete: source was uploaded, the fresh Windows CI run passed on the released commit, tag v1.0.0 was published with matching installer/portable/source assets and checksums, the repository was made public, and anonymous downloads and Issues were verified. Launch-material download placeholders were replaced with the verified release URL.
 

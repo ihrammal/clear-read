@@ -4,12 +4,12 @@ Accessibility-first Windows OCR application by Iman Rammal.
 
 Welcome, goodbye and recognition milestone messages support Arabic, English and French. Select their language in Tools > Preferences > Accessibility, independently of the OCR language. Menus, detailed progress and help remain in English. Arabic recognition sets the editor reading direction and language for assistive technology.
 
-Prepared version: 1.0.0 (publication pending). Previously named Accessible OCR Studio. Target: Windows 10/11, .NET 8 WPF. Core Arabic/English/French OCR is local, offline and free of charge, without an account or API key. The packaged runtime includes Tesseract language data for Arabic, English and French plus Poppler PDF tools.
+Version 1.0.0 was published on 18 October 2026 as an explicitly unsigned preview: [releases/tag/v1.0.0](https://github.com/ihrammal/clear-read/releases/tag/v1.0.0). Previously named Accessible OCR Studio. Target: Windows 10/11, .NET 8 WPF. Core Arabic/English/French OCR is local, offline and free of charge, without an account or API key. The packaged runtime includes Tesseract language data for Arabic, English and French plus Poppler PDF tools.
 
 The runnable self-contained build is in `publish/ClearRead.exe`; keep the entire `publish` folder together. The executable is ClearRead.exe. Existing settings and protected credentials migrate from the former Accessible OCR Studio folders. See `docs/QA-STATUS-2026-10-18.md` for current verification and remaining release work. Earlier screen-reader evidence is recorded in the 10 and 11 October QA notes.
 
 ## 1.0.0 release preparation
-Application, About box and installer use version 1.0.0. GitHub release notes, source, installer, portable archive, checksums and bilingual launch materials are prepared locally. Publication remains pending the release checklist.
+Application, About box and installer use version 1.0.0. GitHub release notes, source, installer, portable archive, checksums and bilingual launch materials were prepared locally and published with the release. The remaining publication gates are listed in the release checklist below.
 
 ## 0.11.7 Arabic recognition
 Preserves valid Arabic rows that the OCR engine previously discarded as noise. All 150 functional checks passed. See docs/OCR-ACCURACY-0.11.7.md for measured Arabic/French results and the remaining numeral limitations.
@@ -135,20 +135,21 @@ This milestone closes unfinished UI commands, improves structured accessible exp
 - JAWS editor and recognition-complete announcements were confirmed by the user during a generated-English-image workflow.
 - See docs/QA-STATUS-2026-10-17.md for the current functional check results. See the QA status document for the exact verified scope and remaining release gates.
 
-## Prepared development release
+## Published release
 
+- Download the installer, portable archive, source archive and checksums from [v1.0.0](https://github.com/ihrammal/clear-read/releases/tag/v1.0.0).
 - Executable: `publish/ClearRead.exe` (keep the whole publish folder).
 - Installer: `artifacts/ClearRead-Setup-1.0.0.exe`.
 - GitHub source archive: `artifacts/ClearRead-Source-1.0.0.zip`.
 - License: MIT for Clear Read source; dependencies retain their own licenses.
 - Current 1.0.0 verification: 244 functional checks passed (including simulated provider API tests); managed dependency audit
-  reported no known vulnerable packages. See `docs/QA-STATUS-2026-10-17.md`.
+  reported no known vulnerable packages. See `docs/QA-STATUS-2026-10-18.md`.
 - Recreate the source archive with `scripts/package-source.ps1`.
-- Public release still requires live assistive-technology and visual checks,
+- The published preview is explicitly unsigned and still requires live assistive-technology and visual checks,
   clean-machine installation and dependency redistribution review. The owner selected an explicitly unsigned preview.
 
 
-Current release checklist: docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md. The 0.11.7 isolated per-user installer lifecycle passed installation, reinstallation, full file-hash comparison and uninstallation. No GitHub publication was performed.
+Current release checklist: docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md. The 0.11.7 isolated per-user installer lifecycle passed installation, reinstallation, full file-hash comparison and uninstallation. GitHub publication was performed on 18 October 2026; the repository is public, tag v1.0.0 is published, and the fresh Windows CI run passed on the released commit.
 
 
 
@@ -161,5 +162,5 @@ The primary app works offline and needs no API subscription. Optional OpenAI, Ge
 
 
 
-Latest release preparation pins .NET/Windows Desktop 8.0.32, bundles additional dependency notices and fixes provider-selection accessibility announcements. See the [current publication gates](docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md). Repository visibility will be public at publication; release gates remain open.
+Latest release preparation pins .NET/Windows Desktop 8.0.32, bundles additional dependency notices and fixes provider-selection accessibility announcements. See the [current publication gates](docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md). The repository and release are public as requested; the remaining release gates are still open.
 

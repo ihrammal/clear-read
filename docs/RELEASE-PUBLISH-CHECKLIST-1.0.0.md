@@ -1,6 +1,8 @@
 # Clear Read 1.0.0 — current publication checklist
 
-Updated 18 October 2026. Intended tag: v1.0.0. Intended release: explicitly unsigned preview. The owner requested a public repository at publication. No public release, source upload, tag or visibility change has been performed.
+Updated 18 October 2026. Intended tag: v1.0.0. Intended release: explicitly unsigned preview. The owner requested a public repository at publication. Publication was performed on 18 October 2026: the reviewed source was uploaded to the repository, the fresh Windows CI run passed on the released commit, tag v1.0.0 was published as an unsigned prerelease with installer/portable/source assets and checksums, the repository was made public, and anonymous download, hash and issue checks passed.
+
+The gates below the publication line remain open for a later stable release. Publishing the unsigned preview did not close them; the release and README label those limitations.
 
 ## Completed and verified
 
@@ -18,7 +20,7 @@ Updated 18 October 2026. Intended tag: v1.0.0. Intended release: explicitly unsi
 2. **Manual accessibility and documents:** Provider-selection announcements passed the user NVDA retest. Gemini permission, proposed-text review and Apply passed by user report, including the expected corrected sample. Confirm Cancel, remaining welcome/report/error flows, planned JAWS/Narrator coverage, Windows high contrast/200% scaling and representative real scans. Do not replace unperformed listening checks with automated properties.
 3. **Clean Windows installation:** Verify administrative install, production upgrade/uninstall and runtime independence on clean Windows 10/11. This host has an existing machine-wide installation and no WindowsSandbox.exe; isolated per-user tests do not establish clean-machine coverage. Do not modify the existing installation merely to force a passing result.
 4. **API completion scope:** Successful live OpenAI generation has not been confirmed; the owner's key was rejected. Gemini/Groq key tests were user-confirmed; Gemini correction, proposed-text keyboard review and Apply were user-confirmed with the expected sample result. Groq correction and Cancel remain unconfirmed. OpenAI live success depends on a valid account/key and is a documented coverage limitation; the owner need not purchase access for an offline preview. Offline OCR remains usable regardless of account/API availability.
-5. **GitHub CI and publication:** Normal Git authentication and GitHub REST access are verified for the existing private repository, with push/admin permissions. The connector still lacks access. Preserve existing history, upload reviewed changes, and verify the Windows CI run before publication.
+5. **GitHub CI and publication — done:** Normal Git authentication and GitHub REST access were verified for the repository, with push/admin permissions. The reviewed source (excluding runtime, publish, .tools, artifacts, bin/obj, keys and settings) was pushed to `main`, the fresh Windows CI run passed all 244 functional checks plus per-user and machine-wide installer lifecycle tests on the released commit, tag v1.0.0 was published, the repository was made public, and downloads and Issues were verified anonymously. The remaining gates are 1 to 4 above.
 
 ## Final packaging and publication procedure
 
