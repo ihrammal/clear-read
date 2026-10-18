@@ -42,7 +42,8 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/build-installer.ps1
-          ./scripts/test-installer.ps1 -ProductionPackage -SkipLaunch *>&1 | Tee-Object artifacts/installer-verification-ci.txt
+          ./scripts/test-installer.ps1 -ProductionPackage *>&1 | Tee-Object artifacts/installer-verification-ci.txt
+          ./scripts/test-installer.ps1 -ProductionPackage -MachineWide -SkipLaunch *>&1 | Tee-Object artifacts/admin-installer-verification-ci.txt
       - uses: actions/upload-artifact@v4
         with:
           name: ClearRead-win-x64

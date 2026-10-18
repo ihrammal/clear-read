@@ -1,4 +1,4 @@
-param([switch]$ProductionPackage, [switch]$SkipLaunch)
+param([switch]$ProductionPackage, [switch]$SkipLaunch, [switch]$MachineWide)
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 $TestRoot = [IO.Path]::GetFullPath((Join-Path $Root '.tools\install-smoke'))
@@ -9,22 +9,33 @@ $Suffix = if ($ProductionPackage) { '' } else { '-QA' }
 $Installer = Join-Path $Root "artifacts\ClearRead-Setup-1.0.0$Suffix.exe"
 if (-not (Test-Path $Installer)) { throw 'Build the isolated QA installer first with build-installer.ps1 -TestInstall.' }
  $AppIdentity = if ($ProductionPackage) { '{9A9C570A-BA44-49B6-95E4-73B724DD0A60}_is1' } else { 'ClearRead-Isolated-QA_is1' }
-$RegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity"
+$UserRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity"
+if ($MachineWide) {
+    if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Machine-wide installer verification is restricted to the disposable GitHub Windows runner.' }
+    $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Machine-wide verification requires an elevated runner.' }
+}
+$InstallScope = if ($MachineWide) { '/ALLUSERS' } else { '/CURRENTUSER' }
+$ScopeName = if ($MachineWide) { 'Machine-wide' } else { 'Per-user' }
+$LogPrefix = if ($MachineWide) { 'machine-' } else { '' }
+$RegistryPath = if ($MachineWide) { "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity" } else { $UserRegistryPath }
+if (Test-Path $UserRegistryPath) { throw 'An existing per-user installation has this identity.' }
 if (Test-Path $RegistryPath) { throw 'A previous isolated QA installation exists. Inspect it before retrying.' }
 foreach ($machineRegistry in @("HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity", "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity")) {
     if (Test-Path $machineRegistry) { throw 'An installation with this identity already exists. Use the separate QA package.' }
 }
 function Install-App($Log) {
-    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CURRENTUSER /NOICONS /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
+    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART $InstallScope /NOICONS /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "Installation failed: $($process.ExitCode). See $Log" }
 }
 try {
-    Install-App (Join-Path $Root 'artifacts\install-test.log')
+    Install-App (Join-Path $Root ("artifacts\${LogPrefix}install-test.log"))
     foreach ($file in @('ClearRead.exe', 'ocr\tesseract.exe', 'pdf\pdftoppm.exe', 'pdf\pdftotext.exe', 'pdf\pdfunite.exe', 'image\magick.exe', 'help\index.html')) {
         if (-not (Test-Path (Join-Path $TestRoot $file))) { throw "Installed package is missing $file" }
     }
-    Write-Output 'PASS: Per-user installation includes application, OCR, PDF, preprocessing and help files.'
-    Install-App (Join-Path $Root 'artifacts\reinstall-test.log')
+    if (-not (Test-Path $RegistryPath)) { throw 'Installer registration is missing for the requested scope.' }
+    Write-Output "PASS: $ScopeName installation includes application, OCR, PDF, preprocessing and help files and correct registration."
+    Install-App (Join-Path $Root ("artifacts\${LogPrefix}reinstall-test.log"))
     Write-Output 'PASS: Reinstall into the same test directory succeeds.'
     $PublishRoot = [IO.Path]::GetFullPath((Join-Path $Root 'publish'))
     foreach ($file in Get-ChildItem $PublishRoot -Recurse -File) {
@@ -58,12 +69,12 @@ try {
 finally {
     $Uninstaller = Join-Path $TestRoot 'unins000.exe'
     if (Test-Path $Uninstaller) {
-        $process = Start-Process -FilePath $Uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG=`"$Root\artifacts\uninstall-test.log`"" -WindowStyle Hidden -Wait -PassThru
+        $process = Start-Process -FilePath $Uninstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LOG=`"$Root\artifacts\${LogPrefix}uninstall-test.log`"" -WindowStyle Hidden -Wait -PassThru
         if ($process.ExitCode -ne 0) { throw 'Test uninstall failed.' }
         for ($attempt = 0; $attempt -lt 20 -and (Test-Path $TestRoot); $attempt++) { Start-Sleep -Seconds 1 }
         if (Test-Path $TestRoot) { throw 'Uninstallation left files in the test directory.' }
         if (Test-Path $RegistryPath) { throw 'Uninstallation left its test registration.' }
-        Write-Output 'PASS: Uninstall removes the test binaries, directory and per-user registration.'
+        Write-Output "PASS: Uninstall removes the test binaries, directory and $ScopeName registration."
     }
 }
 
