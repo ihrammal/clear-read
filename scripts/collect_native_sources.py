@@ -1,4 +1,4 @@
-"""Collect hash-matched copyleft PDF source archives for release review.
+"""Collect hash-matched open-source PDF source archives for release review.
 Requires PyYAML for reading the already collected Conda recipes. Does not grant
 redistribution approval or claim coverage of Tesseract/ImageMagick dependencies.
 """
@@ -17,7 +17,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 review = json.loads((ROOT/'artifacts/poppler-dependency-review-1.0.0.json').read_text(encoding='utf-8-sig'))
 records = []
 for package in review['packages']:
-    if not package.get('matchedFiles') or not any(x in package['license'] for x in ('GPL', 'MPL')):
+    if not package.get('matchedFiles') or 'Microsoft' in package['license']:
         continue
     folder = ROOT / package['metadataFolder'] / 'info/recipe'
     recipe = folder / 'meta.yaml'
@@ -65,7 +65,7 @@ for package in review['packages']:
             record['failure']=str(exc)
         records.append(record)
         print(package['name'] + ': ' + record['status'], flush=True)
-report=dict(scope='copyleft PDF dependency source archives only', correspondingSourceComplete=False, redistributionApproved=False, records=records,
+report=dict(scope='Matched open-source PDF dependency source archives; Microsoft system runtime sources excluded', correspondingSourceComplete=False, redistributionApproved=False, records=records,
             remaining=['Review matching build/patch instructions in the Poppler review evidence archive.', 'Collect any failed archives.', 'Complete separate Tesseract/ImageMagick native source and notice matching.'])
 report_path=ROOT/'artifacts/native-source-evidence-1.0.0.json'
 report_path.write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')

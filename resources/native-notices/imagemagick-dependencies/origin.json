@@ -1,0 +1,6 @@
+{
+  "sourceArchive": "https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-33/ImageMagick-7.1.2-33-Windows.7z",
+  "sourceArchiveSha256": "cccc7ba9e099d634d266dbe4d9d86443e39702abeaf77367cc01374a8ece91a3",
+  "method": "Notice files copied unchanged from hash-verified exact Windows source asset; source/build files will accompany release separately.",
+  "noticeFiles": 119
+}
