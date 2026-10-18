@@ -11,7 +11,7 @@ foreach ($directory in @('src', 'tests', 'scripts', 'help', 'resources', 'instal
     $Files += Get-ChildItem -LiteralPath (Join-Path $Root $directory) -Recurse -File -Force |
         Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' -and $_.Extension -notin @('.user', '.suo') }
 }
-foreach ($name in @('README.md', 'LICENSE', '.gitignore')) { $Files += Get-Item -Force (Join-Path $Root $name) }
+foreach ($name in @('README.md', 'LICENSE', '.gitignore', 'global.json')) { $Files += Get-Item -Force (Join-Path $Root $name) }
 $Stream = [System.IO.File]::Open($Output, [System.IO.FileMode]::Create)
 $Zip = [System.IO.Compression.ZipArchive]::new($Stream, [System.IO.Compression.ZipArchiveMode]::Create)
 try {
