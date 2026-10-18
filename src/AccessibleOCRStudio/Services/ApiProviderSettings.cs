@@ -1,7 +1,7 @@
 namespace AccessibleOCRStudio.Services;
 
 // Provider-neutral configuration. API keys are intentionally not written to settings.json.
-// A production credential vault will store secrets using Windows-protected credentials.
+// CredentialService stores per-user secrets with Windows DPAPI.
 public sealed class ApiProviderSettings
 {
     public string Provider { get; set; } = "None";
@@ -11,3 +11,4 @@ public sealed class ApiProviderSettings
     public bool AllowTableReconstruction { get; set; }
     public bool AllowDocumentContentToLeaveComputer { get; set; }
 }
+

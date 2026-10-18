@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private bool _altPressed;
     private bool _altUsedWithOtherKey;
     private UIElement? _menuReturnFocus;
+    private CancellationTokenSource? _apiCancellation;
     private bool _busy;
     private bool _closing;
     private string _savedText = string.Empty;
@@ -122,11 +123,74 @@ public partial class MainWindow : Window
         finally { _busy = false; }
     }
 
+    private async void OpenAiCorrection_Click(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        var key = new CredentialService().Load(_settings.ApiProvider) ?? string.Empty;
+        if (ApiCorrectionService.ConfigurationError(_settings, key) is { } error)
+        {
+            if (DialogGuard.Show(this, error + "\n\nOpen API settings now? After saving, this correction request will continue and ask for confirmation before sending text.", "API correction setup", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+            var settingsWindow = new ApiSettingsWindow(_settings) { Owner = this };
+            if (ShowDialogReturningFocus(settingsWindow) != true) return;
+            key = new CredentialService().Load(_settings.ApiProvider) ?? string.Empty;
+            if (ApiCorrectionService.ConfigurationError(_settings, key) is { } remainingError)
+            {
+                StatusText.Text = "API settings saved, but correction has not started. " + remainingError;
+                DialogGuard.Show(this, StatusText.Text, "API correction setup", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+        }
+        var selected = DocumentText.SelectionLength > 0;
+        var start = selected ? DocumentText.SelectionStart : 0;
+        var original = selected ? DocumentText.SelectedText : DocumentText.Text;
+        if (string.IsNullOrWhiteSpace(original) || original.Length > OpenAiCorrectionService.MaximumCharacters)
+        {
+            DialogGuard.Show(this, $"Recognize a document or enter text, then select up to {OpenAiCorrectionService.MaximumCharacters:N0} characters. With no selection, the whole editor is sent.", "API correction");
+            return;
+        }
+        if (DialogGuard.Show(this, $"Send {(selected ? "the selected" : "all editor")} text ({original.Length:N0} characters) to {_settings.ApiProvider} using your API account and model {ApiProviderCatalog.Model(_settings, _settings.ApiProvider)}? API charges may apply. No images or file paths will be sent. You will review the result before applying it. {ApiProviderCatalog.Notice(_settings.ApiProvider)}", "Send text to API provider?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+        _busy = true; DocumentText.IsReadOnly = true; CancelApiMenu.IsEnabled = true;
+        using var cancellation = new CancellationTokenSource(); _apiCancellation = cancellation;
+        StatusText.Text = "Requesting API correction. Use OCR > Cancel API request to cancel. Local text is preserved.";
+        try
+        {
+            var corrected = await new ApiCorrectionService().CorrectAsync(original, _settings, key, true, cancellation.Token);
+            var review = new ApiCorrectionReviewWindow(original, corrected) { Owner = this };
+            if (ShowDialogReturningFocus(review) == true)
+            {
+                DocumentText.IsReadOnly = false;
+                ApplyApiCorrection(start, original.Length, corrected);
+                StatusText.Text = "API correction applied. Review the text; Undo restores the original.";
+            }
+            else StatusText.Text = "API correction discarded. Original local text retained.";
+        }
+        catch (OperationCanceledException) { StatusText.Text = "API request cancelled. Original local text retained."; }
+        catch (Exception ex)
+        {
+            StatusText.Text = "API correction failed. Original local text retained; offline OCR remains available.";
+            DialogGuard.Show(this, ex.Message, "API correction", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        finally
+        {
+            _apiCancellation = null; CancelApiMenu.IsEnabled = false; DocumentText.IsReadOnly = false; _busy = false; DocumentText.Focus();
+        }
+    }
+
+    internal void ApplyApiCorrection(int start, int length, string corrected)
+    {
+        DocumentText.BeginChange();
+        try { DocumentText.Select(start, length); DocumentText.SelectedText = corrected; }
+        finally { DocumentText.EndChange(); }
+        _lastRecognition = null; _lowConfidenceIndex = -1;
+    }
+
+    private void CancelApi_Click(object sender, RoutedEventArgs e) => _apiCancellation?.Cancel();
+
     private void ApiSettings_Click(object sender, RoutedEventArgs e)
     {
         var w = new ApiSettingsWindow(_settings) { Owner = this };
         var saved = ShowDialogReturningFocus(w);
-        if (saved == true) StatusText.Text = _settings.OfflineOnlyMode ? "API settings saved. Offline only mode is enabled." : "API settings saved.";
+        if (saved == true) StatusText.Text = _settings.OfflineOnlyMode ? "API settings saved. Offline only mode is enabled." : "API settings saved. No correction has run. To correct editor text, choose OCR > Correct text with selected API.";
     }
 
     private void Preferences_Click(object sender, RoutedEventArgs e)
@@ -478,4 +542,8 @@ public partial class MainWindow : Window
         finally { _closing = false; }
     }
 }
+
+
+
+
 

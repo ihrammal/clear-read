@@ -31,3 +31,8 @@ packages the complete publish folder, including offline language models.
 - Code signing remains outstanding. Do not advertise the package as signed.
 
 The repository remains empty and private. No source or binary upload has occurred. Keep it private during preparation; when the approved release is published, make the repository public so users can download the app and submit issues.
+
+## Latest preparation — 18 October 2026
+
+See QA-STATUS-2026-10-18.md. The owner selected an unsigned preview; trusted signing is not required for that preview and must not be claimed. Native redistribution, clean-machine and remaining accessibility checks are open. The GitHub connector could not access ihrammal/clear-read (API 422); no upload or visibility change was attempted. Run scripts/verify-release-artifacts.ps1 before uploading the prepared assets.
+

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net8.0-windows10.0.17763.0</TargetFramework><UseWPF>true</UseWPF><EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><AssemblyName>ClearRead</AssemblyName>
-    <Version>1.0.0</Version><Authors>Iman Rammal</Authors><Product>Clear Read</Product>
+    <Version>1.0.0</Version><RuntimeFrameworkVersion>8.0.32</RuntimeFrameworkVersion><Authors>Iman Rammal</Authors><Product>Clear Read</Product>
   </PropertyGroup>
   <ItemGroup><InternalsVisibleTo Include="AccessibleOCRStudio.SmokeTests" /></ItemGroup>
   <ItemGroup><PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
@@ -11,9 +11,14 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" /></ItemGroup>
   <ItemGroup>
     <Content Include="..\..\runtime\**\*" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\resources\native-notices\**\*" Link="licenses\native\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\LICENSE" Link="licenses\ClearRead-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\docs\THIRD-PARTY-NOTICES.txt" Link="licenses\THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\help\**\*" Link="help\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\resources\sounds\*.wav" Link="resources\sounds\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <!-- Keep the Windows API reference pack independent of the .NET servicing version. -->
+  <ItemGroup><FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.17763.56" /></ItemGroup>
 </Project>
+
+

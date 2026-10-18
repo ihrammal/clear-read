@@ -10,6 +10,7 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -31,7 +32,9 @@ jobs:
         run: ./scripts/setup-runtime.ps1
       - name: Run functional tests
         shell: pwsh
-        run: ./scripts/test-windows.ps1
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          ./scripts/test-windows.ps1 *>&1 | Tee-Object artifacts/functional-verification-ci.txt
       - name: Publish win-x64
         shell: pwsh
         run: ./scripts/build-windows.ps1
@@ -39,10 +42,21 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/build-installer.ps1
-          ./scripts/test-installer.ps1 -ProductionPackage -SkipLaunch
+          ./scripts/test-installer.ps1 -ProductionPackage -SkipLaunch *>&1 | Tee-Object artifacts/installer-verification-ci.txt
       - uses: actions/upload-artifact@v4
         with:
           name: ClearRead-win-x64
           path: |
             publish/
-            artifacts/installer-verification-ci.txt
+            artifacts/ClearRead-Setup-*.exe
+          if-no-files-found: error
+      - name: Preserve verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ClearRead-verification
+          path: |
+            artifacts/*verification-ci.txt
+            artifacts/*test.log
+          if-no-files-found: warn
+

@@ -28,3 +28,8 @@
 
 ## Release gate
 A release must not be described as production-ready until it compiles on Windows, automated tests pass, bundled OCR/PDF dependencies are verified, and core workflows pass keyboard + NVDA testing.
+
+## Offline OCR and API regressions — 18 October 2026
+
+The full suite now includes 241 checks. Run scripts/test-windows.ps1; provider HTTP requests are mocked and need no real key. Run the test executable with --api-checks-only for focused provider/key/correction tests. Current offline regression output: artifacts/verification-offline-api-2026-10-18.txt. For a live test, users enter their own provider key in API and AI Settings and choose Test API key. That sends a fixed sample and may consume quota or incur a charge; never put keys in test source, screenshots or reports.
+

@@ -1,0 +1,18 @@
+{
+  "package": "ucrt",
+  "version": "10.0.26100.0",
+  "archive": "Windows SDK 26100.4654 ISO",
+  "source": "https://go.microsoft.com/fwlink/?linkid=2326092",
+  "sha256": "bbaf94039238e84a532088189728133c3753a085a8c2ae060d5eb511ae610f97",
+  "extraction": "Windows SDK EULA MSI File/Media tables; original RTF files copied unchanged",
+  "files": [
+    {
+      "file": "sdk_license.rtf",
+      "sha256": "0F4A26AC9DC50066F8A1BFEAAF3F092D1B9E4791DF5487B9F3C31E7C3DC4D7F5"
+    },
+    {
+      "file": "sdk_third_party_notices.rtf",
+      "sha256": "EBB6640A8246B39B70322C5CEC9AAD7A71E86EA7B86C9C604D3A7F3FF1B30E89"
+    }
+  ]
+}

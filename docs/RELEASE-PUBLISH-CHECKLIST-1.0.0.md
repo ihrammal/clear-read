@@ -1,45 +1,31 @@
-# Clear Read 1.0.0 — publication handoff
+# Clear Read 1.0.0 — current publication checklist
 
-Prepared 17 October 2026. Requested product version: 1.0.0; intended tag v1.0.0. No GitHub release/tag or public download has been created by this preparation step.
+Updated 18 October 2026. Intended tag: v1.0.0. Intended release: explicitly unsigned preview. The owner requested a public repository at publication. No public release, source upload, tag or visibility change has been performed.
 
-## Expected local assets
+## Completed and verified
 
-- artifacts/ClearRead-Setup-1.0.0.exe — self-contained Windows x64 installer.
-- artifacts/ClearRead-1.0.0-win-x64.zip — full portable application folder.
-- artifacts/ClearRead-Source-1.0.0.zip — source, tests, scripts, help, resources and documentation; excludes bundled binaries, generated files, local settings and keys.
-- artifacts/ClearRead-Launch-Kit-1.0.0.zip — Arabic/English promotional cards, actual OCR screenshots, social caption drafts and image descriptions.
-- artifacts/SHA256SUMS.txt — final artifact hashes.
-- artifacts/release-manifest-1.0.0.json — actual version, signature and hash metadata.
-- docs/RELEASE-NOTES-1.0.0.md — reviewable release-body draft.
+- Free offline Arabic, English and French OCR remains the primary/default operation. No account, Internet connection or API key is required. Offline-only mode is enabled by default and blocks API requests and update checks.
+- All 244 functional checks passed on .NET/Windows Desktop 8.0.32. Local multilingual OCR/PDF/export checks ran with unreachable HTTP/HTTPS/ALL proxies; this is not a physically disconnected clean-machine test. API adapters were tested with dummy credentials and simulated responses.
+- Microsoft release metadata identified 8.0.32 as the current .NET 8 servicing runtime. Hash-verified core/Desktop runtimes were installed locally, and the application/test build now pins 8.0.32. Build completed with no warnings/errors. The managed NuGet audit reports no known vulnerable packages in its queried feed; native code is outside that audit.
+- Gemini and Groq live Test API key actions passed according to Iman's report. OpenAI returned a key-rejection message. No key was shared in chat or bundled. This confirms the reported key-test scope, not a successful correction of arbitrary documents with every provider.
+- Iman confirmed NVDA reads the API-key edit field, Create/Test buttons and offline/sharing checkboxes, and that keyboard navigation reaches them. Provider selection was not announced clearly; a dedicated provider-name live region and current-selection accessible name were added. Its automated checks passed, and Iman confirmed that Up/Down arrows now announce the provider names without refocusing.
+- All 143 PDF runtime files match the collected package SHA256 metadata across 34 contributing packages. Notices for all 34 packages, including version-tagged upstream FreeType notices and UCRT notices extracted from the exact hash-verified Microsoft SDK ISO, are preserved under resources/native-notices and included by the project. Current .NET runtime notices and local SDK notices are preserved there too. This does not complete the full redistribution/source review.
+- Signing is optional for the owner-approved unsigned preview. Never advertise trusted signing or completed stable-release validation.
 
-## Local checks
+## Gates still open — do not publish until resolved
 
-Version is set consistently in the project, About box, installer and version checks. Final build, functional tests, source validation and isolated installer lifecycle results are recorded in artifacts/verification-1.0.0.txt and artifacts/installer-verification-1.0.0.txt. Read actual results before marking a check complete. Earlier measured Arabic/French accuracy is in docs/OCR-ACCURACY-0.11.7.md; recognition code is unchanged by the 1.0.0 version preparation. Prior UI shortcut checks and 0.11.7 OCR captures remain applicable evidence, not new universal-accessibility certification.
+1. **Native redistribution/source review:** UCRT notice collection is complete. Complete corresponding-source/build records where required, plus exact Tesseract native-library and ImageMagick delegate provenance/notices. Collected notices, recipes and one source archive do not establish complete corresponding source for every binary. See NATIVE-REDISTRIBUTION-CHECKLIST.md.
+2. **Manual accessibility and documents:** Provider-selection announcements passed the user NVDA retest. Gemini permission, proposed-text review and Apply passed by user report, including the expected corrected sample. Confirm Cancel, remaining welcome/report/error flows, planned JAWS/Narrator coverage, Windows high contrast/200% scaling and representative real scans. Do not replace unperformed listening checks with automated properties.
+3. **Clean Windows installation:** Verify administrative install, production upgrade/uninstall and runtime independence on clean Windows 10/11. This host has an existing machine-wide installation and no WindowsSandbox.exe; isolated per-user tests do not establish clean-machine coverage. Do not modify the existing installation merely to force a passing result.
+4. **API completion scope:** Successful live OpenAI generation has not been confirmed; the owner's key was rejected. Gemini/Groq key tests were user-confirmed; Gemini correction, proposed-text keyboard review and Apply were user-confirmed with the expected sample result. Groq correction and Cancel remain unconfirmed. OpenAI live success depends on a valid account/key and is a documented coverage limitation; the owner need not purchase access for an offline preview. Offline OCR remains usable regardless of account/API availability.
+5. **GitHub CI and publication:** Normal Git authentication and GitHub REST access are verified for the existing private repository, with push/admin permissions. The connector still lacks access. Preserve existing history, upload reviewed changes, and verify the Windows CI run before publication.
 
-## Publication gates still open
+## Final packaging and publication procedure
 
-1. Finish exact native dependency license/notices and corresponding-source/build records where applicable. The matching upstream Poppler core COPYING is now collected and preserved by setup-runtime.ps1; its transitive Windows dependency audit is incomplete. See NATIVE-REDISTRIBUTION-CHECKLIST.md.
-2. Trusted signing is unavailable; the owner has no certificate/service. Do not advertise either binary as signed. Arrange signing or explicitly decide whether an accurately labeled unsigned preview is appropriate after licensing is resolved. A 1.0.0 version number alone does not close these gates.
-3. Clean Windows 10/11 administrator installation, upgrade/uninstall, real scans, high contrast/200% scaling, and current welcome/report UI NVDA listening remain incomplete. No separate test machine is available. Local isolated per-user checks are not equivalent to clean-machine/human assistive-technology coverage.
-4. Re-establish access to private ihrammal/clear-read before upload. Its existence/Issues/private visibility were verified in signed-in Chrome; the connector subsequently returned 404 and cannot be assumed to have permission. No credential or permission bypass is authorized.
+The app and installers are rebuilt after the servicing/accessibility/notices changes. Read actual final logs before marking packaging complete: artifacts/build-final-2026-10-18.txt, artifacts/installer-verification-final-2026-10-18.txt and artifacts/artifact-verification-final-2026-10-18.txt. The isolated QA installer test covers install, reinstall, all file hashes and uninstall; UI launch is intentionally skipped and cannot substitute for manual accessibility checks. No production upgrade is claimed.
 
-## When approved and ready
+Regenerate source and portable ZIPs and refresh the manifest/SHA256SUMS after all final edits. scripts/verify-release-artifacts.ps1 verifies every source/publish file, executable versions, the bundled .NET 8.0.32 runtime, required notices and asset hashes. Its success establishes artifact integrity, not release readiness.
 
-- Populate the private repository with the source archive contents, preserving MIT and other notices. Exclude runtime, publish, .tools, artifacts, bin/obj, user settings and certificates.
-- Run the GitHub Windows workflow on a fresh runner and inspect its logs. This supplements, but does not replace, human NVDA/Windows desktop checks.
-- Create tag v1.0.0 against the verified source commit; prepare the release with the matching installer/portable hashes, source and required third-party source materials. Rebuild and regenerate every hash after signing or changing packaged files.
-- As requested, keep private during preparation; make the repository public at approved release publication. Confirm anonymously that the release download and issue tracker work.
-- Only then replace [DOWNLOAD LINK]/[رابط التنزيل] in the launch kit and give the owner the verified installer download link. Do not post to social networks automatically.
+After all gates pass, populate the private repository with reviewed source (excluding runtime, publish, .tools, artifacts, bin/obj, keys and settings), run the Windows CI workflow on a fresh runner, and inspect the logs. Tag the verified commit v1.0.0 and publish the accurately labeled unsigned prerelease with matching installer/portable/source assets and required third-party source materials. Make the repository public as the owner requested, then verify downloads and Issues anonymously. Only then replace download placeholders in the launch materials. Do not post to social networks automatically.
 
-Do not confuse a prepared local asset or a draft release body with a published release.
-
-## Final preparation results
-
-- All 150 functional checks passed for 1.0.0. Source and key-conflict validation passed; build completed without warnings/errors.
-- Application ProductVersion is 1.0.0; FileVersion and assembly version are 1.0.0.0.
-- Isolated QA installer installation, reinstallation, all installed-file hashes and uninstallation passed. Installed UI launch was deliberately skipped in that script; earlier desktop checks are separate evidence.
-- The exact production installer test was safely refused because a machine-wide installation with the same app identity already exists. Nothing in that installation was modified; actual production upgrade testing remains open. See artifacts/production-installer-verification-1.0.0.txt.
-- Portable archive includes 742 entries and required OCR models, PDF tools, help and licenses. Source archive contains no generated outputs, runtime binaries or signing keys.
-- App and installer remain unsigned. No public release, tag, source upload or download link was created.
-
-Owner decision: prepare version 1.0.0 as an explicitly unsigned preview. Signing is no longer a required gate for this preview; do not claim trusted signing or stable-release readiness. Native redistribution review and remaining checks still apply.
+Current evidence and limitations: QA-STATUS-2026-10-18.md, OFFLINE-AND-API-2026-10-18.md, and the release manifest. Earlier checklist counts and readiness files are historical.

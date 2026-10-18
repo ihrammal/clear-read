@@ -7,3 +7,6 @@ Tesseract and tessdata model licenses and authorship notices are in licenses/tes
 Image preprocessing uses the portable ImageMagick 7.1.2-33 Q8 x64 build from https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.2-33. Its LICENSE.txt and NOTICE.txt are included under licenses/imagemagick. The portable build's native delegates are described in its notices.
 
 Before a public binary release, verify the exact versions and licenses of every bundled dependency and copy their required notices into the installed application.
+
+Additional collected PDF dependency notices and exact-version FreeType notices are bundled under licenses/native/poppler-dependencies. Their origins are recorded in licenses/native/notice-origins.json. Portions of this software are based on the work of the FreeType Team (https://freetype.org). Local Microsoft .NET 8.0.32 runtime notices and SDK notices are preserved under licenses/native/dotnet. These notices do not establish that all native redistribution/source obligations have been completed; UCRT notices have been extracted from the exact hash-verified Microsoft SDK ISO, with provenance preserved in its notice folder. Complete Tesseract/ImageMagick delegate provenance/source work remains open.
+

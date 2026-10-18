@@ -4,9 +4,9 @@ Accessibility-first Windows OCR application by Iman Rammal.
 
 Welcome, goodbye and recognition milestone messages support Arabic, English and French. Select their language in Tools > Preferences > Accessibility, independently of the OCR language. Menus, detailed progress and help remain in English. Arabic recognition sets the editor reading direction and language for assistive technology.
 
-Prepared version: 1.0.0 (publication pending). Previously named Accessible OCR Studio. Target: Windows 10/11, .NET 8 WPF. Core OCR is local/offline. The packaged runtime includes Tesseract language data for Arabic, English and French plus Poppler PDF tools.
+Prepared version: 1.0.0 (publication pending). Previously named Accessible OCR Studio. Target: Windows 10/11, .NET 8 WPF. Core Arabic/English/French OCR is local, offline and free of charge, without an account or API key. The packaged runtime includes Tesseract language data for Arabic, English and French plus Poppler PDF tools.
 
-The runnable self-contained build is in `publish/ClearRead.exe`; keep the entire `publish` folder together. The executable is ClearRead.exe. Existing settings and protected credentials migrate from the former Accessible OCR Studio folders. See `docs/QA-STATUS-2026-10-17.md` for current verification and remaining release work. Earlier screen-reader evidence is recorded in the 10 and 11 October QA notes.
+The runnable self-contained build is in `publish/ClearRead.exe`; keep the entire `publish` folder together. The executable is ClearRead.exe. Existing settings and protected credentials migrate from the former Accessible OCR Studio folders. See `docs/QA-STATUS-2026-10-18.md` for current verification and remaining release work. Earlier screen-reader evidence is recorded in the 10 and 11 October QA notes.
 
 ## 1.0.0 release preparation
 Application, About box and installer use version 1.0.0. GitHub release notes, source, installer, portable archive, checksums and bilingual launch materials are prepared locally. Publication remains pending the release checklist.
@@ -141,13 +141,25 @@ This milestone closes unfinished UI commands, improves structured accessible exp
 - Installer: `artifacts/ClearRead-Setup-1.0.0.exe`.
 - GitHub source archive: `artifacts/ClearRead-Source-1.0.0.zip`.
 - License: MIT for Clear Read source; dependencies retain their own licenses.
-- Current 1.0.0 verification: 150 functional checks passed; managed dependency audit
+- Current 1.0.0 verification: 244 functional checks passed (including simulated provider API tests); managed dependency audit
   reported no known vulnerable packages. See `docs/QA-STATUS-2026-10-17.md`.
 - Recreate the source archive with `scripts/package-source.ps1`.
 - Public release still requires live assistive-technology and visual checks,
-  clean-machine installation, dependency redistribution review and signing.
+  clean-machine installation and dependency redistribution review. The owner selected an explicitly unsigned preview.
 
 
 Current release checklist: docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md. The 0.11.7 isolated per-user installer lifecycle passed installation, reinstallation, full file-hash comparison and uninstallation. No GitHub publication was performed.
 
+
+
+Latest local preparation: [18 October QA status](docs/QA-STATUS-2026-10-18.md). Release archive integrity can be checked with scripts/verify-release-artifacts.ps1; Poppler provenance evidence can be rebuilt with scripts/package-native-evidence.ps1. These checks do not replace the remaining publication gates.
+
+
+## Free offline OCR and optional APIs
+
+The primary app works offline and needs no API subscription. Optional OpenAI, Gemini and Groq text correction uses each user's own key. Gemini/Groq offer limited free tiers; paid plans may charge. Settings include provider-specific Create API key and Test API key actions. Sending document text requires explicit permissions and confirmation; proposals are reviewed before applying. Failed API requests retain the local text. See [setup and limitations](help/offline-and-api.html) and [implementation and validation](docs/OFFLINE-AND-API-2026-10-18.md).
+
+
+
+Latest release preparation pins .NET/Windows Desktop 8.0.32, bundles additional dependency notices and fixes provider-selection accessibility announcements. See the [current publication gates](docs/RELEASE-PUBLISH-CHECKLIST-1.0.0.md). Repository visibility will be public at publication; release gates remain open.
 

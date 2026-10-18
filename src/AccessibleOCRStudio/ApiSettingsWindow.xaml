@@ -1,10 +1,26 @@
-<Window x:Class="AccessibleOCRStudio.ApiSettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="API and Privacy Settings" Height="560" Width="700" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
-<Grid Margin="16"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
+<Window x:Class="AccessibleOCRStudio.ApiSettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="API and Privacy Settings" Height="680" Width="700" MinHeight="320" MinWidth="360" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+<Grid Margin="16"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+<ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
 <TextBlock Text="API and privacy" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+<TextBlock Text="Arabic, English and French OCR works offline, free of charge, without an account or API key. Optional online correction uses your own provider key. Free-tier quotas or paid charges may apply. Failures keep your local OCR text." TextWrapping="Wrap" Margin="0,0,0,8"/>
 <CheckBox x:Name="OfflineOnly" Content="Offline only mode (recommended)" Margin="0,5"/>
-<CheckBox x:Name="AllowContent" Content="Allow document content to be sent to configured API services" Margin="0,5"/>
-<TextBlock Text="Provider" Margin="0,12,0,0"/><ComboBox x:Name="Provider" Margin="0,5" AutomationProperties.Name="API provider"><ComboBoxItem Content="None"/><ComboBoxItem Content="OpenAI"/><ComboBoxItem Content="Custom"/></ComboBox>
-<TextBlock Text="API key" Margin="0,12,0,0"/><PasswordBox x:Name="ApiKey" Margin="0,5" AutomationProperties.Name="API key"/>
-<TextBlock Text="API keys are protected for the current Windows user and are not stored in settings.json." TextWrapping="Wrap" Margin="0,8"/>
-<CheckBox x:Name="OcrCorrection" Content="Allow API-assisted OCR correction" Margin="0,5"/><CheckBox x:Name="ImageDescription" Content="Allow image description" Margin="0,5"/><CheckBox x:Name="TableReconstruction" Content="Allow table reconstruction" Margin="0,5"/>
-</StackPanel></ScrollViewer><StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="Save" Width="90" Margin="4" IsDefault="True" Click="Save_Click"/><Button Content="Cancel" Width="90" Margin="4" IsCancel="True"/></StackPanel></Grid></Window>
+<CheckBox x:Name="AllowContent" Content="Allow document text to be sent to the selected API provider after confirmation" Margin="0,5"/>
+<TextBlock Text="Provider" Margin="0,12,0,0"/><ComboBox x:Name="Provider" Margin="0,5" AutomationProperties.Name="API provider"><ComboBoxItem Content="None"/><ComboBoxItem Content="OpenAI"/><ComboBoxItem Content="Gemini"/><ComboBoxItem Content="Groq"/><ComboBoxItem Content="Custom" IsEnabled="False"/></ComboBox>
+<TextBlock x:Name="ProviderSelectionStatus" Focusable="True" TextWrapping="Wrap" AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite" Margin="0,3"/>
+<TextBlock x:Name="ProviderNotice" TextWrapping="Wrap" Margin="0,6"/><TextBlock Text="Save the selected provider before switching to another one. Each provider has its own saved key and model. Custom providers are not available." TextWrapping="Wrap"/>
+<TextBlock x:Name="ApiKeyLabel" Text="Your provider API key" Margin="0,12,0,0"/><PasswordBox x:Name="ApiKey" Margin="0,5" AutomationProperties.Name="API key"/>
+<Button x:Name="CreateApiKey" Content="_Create API key (opens provider website)" HorizontalAlignment="Left" Margin="0,5" Padding="8,4" Click="CreateApiKey_Click"/>
+<TextBlock Text="Create your own key on the selected provider website, then paste it here. Clear Read does not provide a shared key. Keys are protected for your Windows user and are not stored in settings.json. Clear the field and Save to remove the selected provider's saved key." TextWrapping="Wrap" Margin="0,8"/>
+<TextBlock Text="Provider model ID" Margin="0,8,0,0"/><TextBox x:Name="ModelId" AutomationProperties.Name="Provider model ID" Margin="0,5"/>
+<Button x:Name="TestApiKey" Content="_Test API key" HorizontalAlignment="Left" Margin="0,5" Padding="8,4" Click="TestApiKey_Click"/>
+<TextBlock x:Name="ApiStatus" Text="Test API key sends a fixed short sample to the selected provider using this key and model. It uses free quota or may incur a small charge according to your account plan. Your document is never used for this test." TextWrapping="Wrap" Focusable="True" AutomationProperties.Name="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite" Margin="0,5"/>
+<CheckBox x:Name="OcrCorrection" Content="Allow API-assisted OCR text correction" Margin="0,5"/>
+<TextBlock Text="Use OCR > Correct text with selected API after local recognition. Select text to send only that selection (maximum 12,000 characters per request). Review the result before applying it." TextWrapping="Wrap" Margin="0,5"/>
+<CheckBox x:Name="ImageDescription" Content="Image description (not available in this preview)" IsEnabled="False" Margin="0,5"/>
+<CheckBox x:Name="TableReconstruction" Content="Table reconstruction (not available in this preview)" IsEnabled="False" Margin="0,5"/>
+</StackPanel></ScrollViewer>
+<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="_Save" Width="90" Margin="4" IsDefault="True" Click="Save_Click"/><Button Content="_Cancel" Width="90" Margin="4" IsCancel="True"/></StackPanel>
+</Grid></Window>
+
+
+

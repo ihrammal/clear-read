@@ -1,3 +1,5 @@
+Historical stable-release gate. The owner subsequently selected version 1.0.0 for an explicitly unsigned preview. See RELEASE-PUBLISH-CHECKLIST-1.0.0.md and QA-STATUS-2026-10-18.md for the current publication decision; this older checklist does not establish that its remaining checks passed.
+
 # Clear Read 0.11.1 release-candidate gate
 
 Clear Read must not be labeled 1.0 until every mandatory gate below passes on Windows.
@@ -43,3 +45,4 @@ Clear Read must not be labeled 1.0 until every mandatory gate below passes on Wi
 
 ## Release decision
 Only after all mandatory gates pass may the version be changed to 1.0.0 and the installer published.
+

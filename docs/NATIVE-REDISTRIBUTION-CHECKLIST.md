@@ -45,3 +45,22 @@ The exact upstream Poppler source archive was downloaded from https://poppler.fr
 The Windows packager's tagged recipe, https://github.com/oschwartz10612/poppler-windows/blob/v26.09.0-0/package.sh, copies all Library/bin DLLs from its resolved Conda environment. Exact dependency versions/build inputs and notices still need matching; one core COPYING file does not complete that work. New runtime hashes are in artifacts/runtime-manifest-0.11.7.json.
 
 The shipped self-contained .NET framework is 8.0.31. A servicing-metadata lookup failed (host resolution), so its current servicing status was not verified. The System.Drawing.Common NuGet package is separately pinned to 8.0.32; do not confuse that package version with the framework version.
+
+## Rechecked 18 October 2026
+
+The local evidence packager verifies all 143 runtime/pdf files against collected package SHA256 metadata across 34 contributing packages. Run scripts/package-native-evidence.ps1 to reproduce the evidence archive and report. Collected info/licenses folders are missing for libfreetype6 and ucrt. The archive preserves available metadata, notices and recipes, plus upstream Poppler and Windows packager sources; complete corresponding source and redistribution approval are explicitly recorded as incomplete. Tesseract, ImageMagick/delegates and framework checks remain separate.
+
+The owner selected an unsigned preview, so the earlier signing action is optional for that preview. Do not describe binaries as signed.
+
+
+## Final preparation follow-up — 18 October 2026
+
+Version-tagged FreeType LICENSE.TXT, FTL.TXT and GPLv2.TXT were retrieved from the official freetype/freetype VER-2-14-3 tag. Origins and downloaded-file SHA256 values are preserved in resources/native-notices/notice-origins.json. Together with the existing collected notices, 33 contributing PDF dependency packages now have packaged notices; UCRT is the remaining missing collected notice. This resolves the FreeType notice collection gap, not the complete corresponding-source requirement.
+
+The .NET servicing lookup succeeded: latest-runtime=8.0.32, support-phase=maintenance, end-of-life=2026-11-10. The application/test build pins core and Windows Desktop 8.0.32 and preserves notices from the hash-verified runtime archive. The Windows API reference pack remains independent at 10.0.17763.56. Native libraries are outside the managed NuGet audit, which reports no known vulnerabilities in the current feed.
+
+Tesseract reports Leptonica 1.87.0 plus additional image/archive/network dependencies; ImageMagick reports built-in delegates including gslib, cairo, freetype and others. Exact dependency/source/notice matching for those distributions remains unfinished. Do not treat an upstream top-level license or generic source link as completion. The resources are automatically copied to licenses/native in builds and installers.
+
+
+
+Latest verified update: the user confirmed NVDA announces API providers with Up/Down arrows. UCRT license and third-party notice collection is complete from the exact SHA256-verified Microsoft SDK ISO; all 34 PDF package notice sets are now present. Seven exact recipe source archives passed SHA256 verification. The Tesseract audit matched 23 of 55 DLLs to current official MSYS2 packages; 32 remain unmatched and full native source/build obligations remain open. ImageMagick upstream SBOM metadata was collected but does not complete delegate source review. Normal authenticated Git can read the existing private release branch. No public release has been performed.

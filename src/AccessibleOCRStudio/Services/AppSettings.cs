@@ -26,6 +26,9 @@ public sealed class AppSettings
     public bool AllowImageDescription { get; set; } = false;
     public bool AllowTableReconstruction { get; set; } = false;
     public double LowConfidenceThreshold { get; set; } = 70;
+    public string GeminiModel { get; set; } = "gemini-3.5-flash-lite";
+    public string GroqModel { get; set; } = "openai/gpt-oss-20b";
+    public string OpenAiModel { get; set; } = OpenAiCorrectionService.DefaultModel;
     public string ApiProvider { get; set; } = "None";
     public string UpdateFeedUrl { get; set; } = string.Empty;
 
@@ -66,3 +69,5 @@ public sealed class AppSettings
         File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
+
+

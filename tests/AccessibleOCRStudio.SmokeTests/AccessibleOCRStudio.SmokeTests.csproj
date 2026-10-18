@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework><UseWPF>true</UseWPF>
+    <OutputType>Exe</OutputType>    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework><UseWPF>true</UseWPF><RuntimeFrameworkVersion>8.0.32</RuntimeFrameworkVersion>
     <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AccessibleOCRStudio\AccessibleOCRStudio.csproj" />
     <Content Include="..\..\runtime\**\*" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <!-- Keep the Windows API reference pack independent of the .NET servicing version. -->
+  <ItemGroup><FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.17763.56" /></ItemGroup>
 </Project>
+
+

@@ -59,7 +59,9 @@ internal static class Program
         Directory.CreateDirectory(temp);
         try
         {
-            Run(temp);
+            if (!args.Contains("--api-checks-only")) Run(temp);
+            OpenAiChecks.Run(temp, Check);
+            ProviderChecks.Run(temp, Check);
             Console.WriteLine($"All {passed} checks passed.");
             return 0;
         }
@@ -608,5 +610,8 @@ internal static class Program
         public void Report(string value) => messages.Add(value);
     }
 }
+
+
+
 
 

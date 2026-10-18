@@ -1,12 +1,15 @@
-# Clear Read 1.0.0
+# Clear Read 1.0.0 — unsigned preview
 
 GitHub release description draft. Tag: `v1.0.0`. This file does not publish a release. Complete RELEASE-PUBLISH-CHECKLIST-1.0.0.md before copying the release body below.
 
 ---
 
+This is an unsigned preview. Windows may warn about an unrecognized publisher. Manual accessibility and clean-machine validation remain incomplete.
+
 Clear Read converts images and scanned PDF documents into editable text on Windows 10 and 11 (64-bit).
 
-- Arabic, English and French OCR, with core recognition performed locally.
+- Free offline Arabic, English and French OCR, with no account or key required.
+- Optional OpenAI, Gemini and Groq text correction with your own key. Each provider has key-creation and Test API key actions. Free-tier quotas or paid charges may apply; text sharing requires confirmation and results are reviewed before applying.
 - Editable recognized text with Ctrl+A (select all), Ctrl+X (cut), Ctrl+C (copy), Ctrl+V (paste), and undo/redo.
 - Keyboard menu navigation: Alt enters/leaves the menu bar; Left/Right select menus; Down opens a menu; Enter activates an item.
 - Arabic, English and French welcome, goodbye and recognition milestone messages. Menus and help are in English.
@@ -26,12 +29,18 @@ Choose the document's language for the best result. Review OCR output, especiall
 
 Clear Read برنامج لويندوز 10 و11 بنظام 64 بت، يحوّل الصور والمستندات الممسوحة إلى نص قابل للقراءة والتحرير. يدعم العربية والإنجليزية والفرنسية، واختصارات التحرير المعتادة، والعمل بلوحة المفاتيح. يعمل التعرف الأساسي محلياً على الجهاز.
 
+هذه نسخة تجريبية غير موقعة رقمياً. لم يكتمل بعد اختبار إمكانية الوصول والتثبيت على جهاز ويندوز نظيف.
+
 اختر لغة المستند وراجع النص الناتج، وخصوصاً الأرقام والأسماء. عولجت مشكلة حذف بعض الأسطر العربية أثناء التعرف، لكن ذلك لا يعني خلو جميع النتائج من الأخطاء. القوائم والمساعدة باللغة الإنجليزية.
 
 للتثبيت استخدم ClearRead-Setup-1.0.0.exe. وللنسخة المحمولة، فك ضغط ClearRead-1.0.0-win-x64.zip بالكامل ثم شغّل ClearRead.exe مع إبقاء جميع الملفات في المجلد نفسه.
 
 ---
 
-Internal packaging note: app/installer are currently unsigned. Resolve the signing decision and publish an accurate signing statement before public release. Source is MIT; bundled components retain their own licenses. Public binary redistribution review is still open. Do not publish this internal note as proof that review is complete.
+Internal packaging note: app/installer are currently unsigned. The owner selected an explicitly unsigned preview; publish the unsigned status above. Source is MIT; bundled components retain their own licenses. Public binary redistribution review is still open. Do not publish this internal note as proof that review is complete.
 
 Owner decision: prepare version 1.0.0 as an explicitly unsigned preview. Signing is no longer a required gate for this preview; do not claim trusted signing or stable-release readiness. Native redistribution review and remaining checks still apply.
+
+
+API adapter checks use dummy keys and simulated responses. The user confirmed successful Gemini/Groq key tests and NVDA announcements in provider selection. End-to-end correction review, remaining accessibility checks and a successful live OpenAI test are not yet confirmed.
+
