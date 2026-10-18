@@ -39,7 +39,7 @@ foreach ($Directory in @('src','tests','scripts','help','resources','installer',
         Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' -and $_.Extension -notin @('.user','.suo') } |
         ForEach-Object { $SourceFiles[[IO.Path]::GetRelativePath($Root, $_.FullName).Replace('\','/')] = $true }
 }
-foreach ($Name in @('README.md','LICENSE','.gitignore','global.json')) { $SourceFiles[$Name] = $true }
+foreach ($Name in @('README.md','LICENSE','.gitignore','.gitattributes','global.json')) { $SourceFiles[$Name] = $true }
 Test-Archive (Join-Path $Artifacts "ClearRead-Source-$Version.zip") $Root $SourceFiles
 $Publish = Join-Path $Root 'publish'
 $PublishedFiles = @{}
