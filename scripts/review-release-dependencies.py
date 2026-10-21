@@ -244,8 +244,38 @@ def core_sources():
                             tag=metadata['tag_name'], source='official tagged source archive'))
     save(f'core-source-evidence-{VERSION}.json', records)
 
+def ensure_metadata():
+    for repo, tag in (('tesseract-ocr/tesseract','5.5.3'), ('oschwartz10612/poppler-windows','v26.09.0-0'),
+                      ('ImageMagick/ImageMagick','7.1.2-33')):
+        path=ROOT/('artifacts/upstream-'+repo.replace('/','-')+'.json')
+        if not path.exists():
+            request=urllib.request.Request(f'https://api.github.com/repos/{repo}/releases/tags/{tag}',headers=HEADERS)
+            with urllib.request.urlopen(request,timeout=60) as response:
+                path.write_text(json.dumps(json.load(response),indent=2)+'\n',encoding='utf-8')
+
+def additional_origins():
+    path=OUT/'additional-conda-origins.json'
+    if path.exists():
+        return json.loads(path.read_text())
+    records=[]
+    for name,version in (('libfreetype6','2.14.3'),('ucrt','10.0.26100.0')):
+        request=urllib.request.Request(f'https://api.anaconda.org/release/conda-forge/{name}/{version}',headers=HEADERS)
+        with urllib.request.urlopen(request,timeout=60) as response:
+            release=json.load(response)
+        for distribution in release.get('distributions',[]):
+            attrs=distribution.get('attrs',{})
+            if not distribution.get('basename','').startswith('win-64/'):
+                continue
+            record=dict(package=name,version=version,build=attrs.get('build'),packageSha256=distribution.get('sha256'),license=attrs.get('license','See package notices'))
+            if record['build'] and record['packageSha256'] and conda_package(record)['matchedFiles']:
+                records.append(record)
+                break
+    path.write_text(json.dumps(records,indent=2)+'\n')
+    return records
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else 'all'
+    ensure_metadata()
     if mode in ('all', 'upstream'):
         upstream_archives()
     if mode in ('all', 'core'):
@@ -253,9 +283,7 @@ def main():
     if mode in ('all', 'pdf'):
         origins = json.loads((ROOT / 'resources/native-notices/notice-origins.json').read_text(encoding='utf-8-sig'))
         origins = [o for o in origins if o.get('packageSha256') and o.get('build')]
-        additional = OUT / 'additional-conda-origins.json'
-        if additional.exists():
-            origins.extend(json.loads(additional.read_text()))
+        origins.extend(additional_origins())
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             packages = list(executor.map(conda_package, origins))
         matched = {name for p in packages for name in p['matchedFiles']}

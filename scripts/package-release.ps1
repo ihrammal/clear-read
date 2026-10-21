@@ -4,6 +4,11 @@ $Root = Split-Path -Parent $PSScriptRoot
 $Version = [string]$Project.Project.PropertyGroup.Version
 $Artifacts = Join-Path $Root 'artifacts'
 $Publish = Join-Path $Root 'publish'
+$ManifestPath = Join-Path $Artifacts "release-manifest-$Version.json"
+if (Test-Path -LiteralPath $ManifestPath) {
+    $Previous = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+    if ($Previous.published) { throw 'Do not replace the assets of a published release.' }
+}
 $TestLog = Join-Path $Artifacts 'textbridge-tests.log'
 if (-not (Test-Path -LiteralPath $TestLog) -or
     (Get-Content -LiteralPath $TestLog -Raw) -notmatch 'All (\d+) checks passed\.') {
@@ -22,7 +27,16 @@ try {
         [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($Zip, $File.FullName, $Relative) | Out-Null
     }
 } finally { $Zip.Dispose(); $Stream.Dispose() }
-$Assets = foreach ($Name in @("TextBridge-Setup-$Version.exe", "TextBridge-$Version-win-x64.zip", "TextBridge-Source-$Version.zip")) {
+# Older Clear Read update clients require the old installer filename. Both
+# assets contain the identical TextBridge installer, not a separate old build.
+Copy-Item -LiteralPath (Join-Path $Artifacts "TextBridge-Setup-$Version.exe") -Destination (Join-Path $Artifacts "ClearRead-Setup-$Version.exe") -Force
+$AssetNames = @("TextBridge-Setup-$Version.exe", "ClearRead-Setup-$Version.exe", "TextBridge-$Version-win-x64.zip", "TextBridge-Source-$Version.zip")
+$EvidencePath = Join-Path $Artifacts "TextBridge-Dependency-Evidence-$Version.json"
+if (Test-Path -LiteralPath $EvidencePath) {
+    $Evidence = Get-Content -LiteralPath $EvidencePath -Raw | ConvertFrom-Json
+    $AssetNames += @($Evidence.assets.file) + @("TextBridge-Dependency-Evidence-$Version.json")
+}
+$Assets = foreach ($Name in $AssetNames) {
     $File = Get-Item -LiteralPath (Join-Path $Artifacts $Name)
     [ordered]@{ file=$Name; bytes=$File.Length; sha256=(Get-FileHash -LiteralPath $File.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
 }
@@ -35,11 +49,6 @@ $Manifest = [ordered]@{
     appSignature=[string](Get-AuthenticodeSignature -LiteralPath (Join-Path $Publish 'TextBridge.exe')).Status
     installerSignature=[string](Get-AuthenticodeSignature -LiteralPath (Join-Path $Artifacts "TextBridge-Setup-$Version.exe")).Status
     assets=@($Assets)
-}
-$ManifestPath = Join-Path $Artifacts "release-manifest-$Version.json"
-if (Test-Path -LiteralPath $ManifestPath) {
-    $Previous = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
-    if ($Previous.published) { throw 'Do not replace the manifest for a published release.' }
 }
 $Manifest | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ManifestPath -Encoding utf8
 & (Join-Path $PSScriptRoot 'verify-release-artifacts.ps1') -Refresh

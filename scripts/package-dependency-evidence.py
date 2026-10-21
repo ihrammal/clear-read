@@ -69,7 +69,7 @@ ocr_path=ARTIFACTS/f'TextBridge-OCR-Source-Evidence-{VERSION}.zip'
 with zipfile.ZipFile(ocr_path,'w',compression=zipfile.ZIP_STORED) as archive:
     archive.write(ARTIFACTS/f'tesseract-source-evidence-{VERSION}.json','binary-and-source-evidence.json')
     archive.write(ARTIFACTS/f'upstream-binary-evidence-{VERSION}.json','official-runtime-archive-evidence.json')
-    compiler=ARTIFACTS/'tesseract-compiler-review-1.0.0.json'
+    compiler=ARTIFACTS/f'tesseract-compiler-review-{VERSION}.json'
     archive.write(compiler,'compiler-runtime-binary-evidence.json')
     for package in ocr['packages']:
         path=checked(ROOT/package['sourceFile'])
@@ -97,7 +97,7 @@ if not image_path.exists():
 if sha(image_path)!=expected:
     raise ValueError('Packaged ImageMagick source bundle differs')
 
-compiler_records=load('tesseract-compiler-review-1.0.0.json')
+compiler_records=load(f'tesseract-compiler-review-{VERSION}.json')
 compiler_matches={name for record in compiler_records for name in record['matchedFiles']}
 ocr_matches={name for package in ocr['packages'] for name in package['matchedFiles']}
 all_ocr={p.name for p in (ROOT/'runtime/ocr').glob('*.dll')}
