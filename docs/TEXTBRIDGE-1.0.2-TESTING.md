@@ -11,4 +11,7 @@ Use Help > About TextBridge to confirm version **1.0.2** before retesting.
 
 The earlier 1.0.1 source passed a fresh GitHub Windows runner, including per-user and administrative installer lifecycle checks. The 1.0.2 source requires its own matching run. Automated UI properties and key routing checks do not establish NVDA speech results.
 
-The release stays unpublished while the current manual recheck is pending.
+The owner confirmed the version, Alt/Escape behaviour, available low-vision controls
+and hidden status bar, then approved publication on 21 October 2026. The release is
+published; see RELEASE-STATUS-1.0.2.md. This does not claim all broader manual checks
+listed above were performed.

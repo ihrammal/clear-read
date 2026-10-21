@@ -1,9 +1,9 @@
-# TextBridge 1.0.2 — release candidate
+# TextBridge 1.0.2 — released
 
 TextBridge converts Arabic, English and French images and scanned PDFs into editable
 text on Windows. It was previously called Clear Read.
 
-This candidate fixes the manual accessibility findings:
+This release fixes the manual accessibility findings:
 
 - View > Show status bar remembers whether the bar is shown; it starts hidden.
 - Escape closes one menu level at a time. Alt/F10 leaves menu navigation.
@@ -26,6 +26,7 @@ Original app code is free for noncommercial use; commercial use requires the
 author's permission. Third-party components retain their own licenses. Matching
 third-party source/evidence assets accompany the binary distribution.
 
-This is a prepared candidate, not a completed public release. The owner is retesting
-the manual accessibility fixes. Automated checks do not certify screen-reader speech,
-representative scan accuracy, or every Windows desktop configuration.
+Published after the owner confirmed the version, Alt/Escape behaviour, low-vision
+controls and hidden status bar. All 288 functional checks and the matching fresh
+GitHub Windows build and installer checks passed. Automated checks do not certify
+screen-reader speech, representative scan accuracy, or every Windows configuration.

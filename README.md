@@ -1,12 +1,20 @@
-# TextBridge 1.0.2 — local revision, 21 October 2026
+# TextBridge 1.0.2 — released 21 October 2026
 
 TextBridge is a Windows application that extracts editable text from Arabic,
 English and French images and scanned PDFs. By Iman Rammal.
 
 This revision includes a persistent status-bar toggle, Escape navigation one
 menu level at a time, accessible Cut/Copy actions, and font/colour controls under
-View > Reading appearance. See docs/TEXTBRIDGE-1.0.2-TESTING.md for the current
-manual recheck. A public 1.0.2 release has not yet been published.
+View > Reading appearance. The owner confirmed the version, Alt/Escape behaviour,
+low-vision controls and hidden status bar before approving publication.
+
+**[Download TextBridge 1.0.2 for Windows (64-bit)](https://github.com/ihrammal/clear-read/releases/download/v1.0.2/TextBridge-Setup-1.0.2.exe)**
+
+[Release page, portable version, source bundles and checksums](https://github.com/ihrammal/clear-read/releases/tag/v1.0.2).
+The installer is unsigned. The published installer was downloaded anonymously and
+its SHA-256 verified against the prepared artifact. All 288 local functional checks
+and the matching GitHub Windows build/installer checks passed. See
+docs/RELEASE-STATUS-1.0.2.md for the exact verification scope.
 
 This revised version is free for noncommercial use. Commercial use requires
 prior written permission from iman.rammal@gmail.com. See LICENSE. Third-party
