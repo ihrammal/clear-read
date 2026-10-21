@@ -4,6 +4,7 @@
 <TabItem Header="General"><StackPanel Margin="12"><TextBlock Text="Interface language / لغة الواجهة"/><ComboBox x:Name="InterfaceLanguage" AutomationProperties.Name="Interface language / لغة الواجهة" Margin="0,8"><ComboBoxItem Content="Windows language / لغة Windows" Tag="auto"/><ComboBoxItem Content="العربية" Tag="ar"/><ComboBoxItem Content="English" Tag="en"/></ComboBox><TextBlock Text="Language changes apply as soon as you save." TextWrapping="Wrap"/></StackPanel></TabItem><TabItem Header="Accessibility"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
 <CheckBox x:Name="ScreenReader" Content="Screen reader support is always enabled" IsEnabled="False" Margin="0,5"/>
 <CheckBox x:Name="AnnounceProgress" Content="Announce OCR progress" Margin="0,5"/>
+<CheckBox x:Name="ShowStatusBar" Content="Show status bar" Margin="0,5"/>
 <CheckBox x:Name="AccessibleReading" Content="Accessible reading mode (larger document text and spacing)" Margin="0,5"/>
 <CheckBox x:Name="HighContrast" Content="Windows high contrast is used automatically" IsEnabled="False" Margin="0,5"/>
 <CheckBox x:Name="StartupSound" Content="Play startup sound" Margin="0,5"/>
@@ -12,6 +13,15 @@
 <ComboBox x:Name="MessageLanguage" AutomationProperties.Name="Welcome, goodbye and recognition message language" Margin="0,5"><ComboBoxItem Content="Windows language / لغة Windows / Langue Windows" Tag="auto"/><ComboBoxItem Content="العربية" Tag="ar"/><ComboBoxItem Content="English" Tag="en"/><ComboBoxItem Content="Français" Tag="fr"/></ComboBox>
 
 <CheckBox x:Name="WelcomeMessage" Content="Show welcome message" Margin="0,5"/>
+</StackPanel></ScrollViewer></TabItem>
+<TabItem x:Name="LowVisionTab" Header="Low vision"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
+<TextBlock Text="Document font"/><ComboBox x:Name="DocumentFont" AutomationProperties.Name="Document font" Margin="0,5,0,12" SelectionChanged="Appearance_Changed"><ComboBoxItem Content="Segoe UI" Tag="Segoe UI"/><ComboBoxItem Content="Arial" Tag="Arial"/><ComboBoxItem Content="Tahoma" Tag="Tahoma"/><ComboBoxItem Content="Verdana" Tag="Verdana"/><ComboBoxItem Content="Calibri" Tag="Calibri"/><ComboBoxItem Content="Consolas" Tag="Consolas"/></ComboBox>
+<TextBlock Text="Document font size (points)"/><ComboBox x:Name="DocumentSize" IsEditable="True" AutomationProperties.Name="Document font size (points)" Margin="0,5,0,12" SelectionChanged="Appearance_Changed" LostKeyboardFocus="Appearance_Changed"><ComboBoxItem Content="12"/><ComboBoxItem Content="14"/><ComboBoxItem Content="16"/><ComboBoxItem Content="18"/><ComboBoxItem Content="20"/><ComboBoxItem Content="24"/><ComboBoxItem Content="28"/><ComboBoxItem Content="32"/><ComboBoxItem Content="40"/><ComboBoxItem Content="48"/><ComboBoxItem Content="60"/><ComboBoxItem Content="72"/></ComboBox>
+<CheckBox x:Name="BoldDocument" Content="Bold document text" Margin="0,5,0,12" Click="Appearance_Changed"/>
+<TextBlock Text="Interface text size"/><ComboBox x:Name="InterfaceSize" IsEditable="True" AutomationProperties.Name="Interface text size" Margin="0,5,0,12"><ComboBoxItem Content="12"/><ComboBoxItem Content="14"/><ComboBoxItem Content="16"/><ComboBoxItem Content="18"/><ComboBoxItem Content="20"/><ComboBoxItem Content="24"/><ComboBoxItem Content="28"/><ComboBoxItem Content="32"/></ComboBox>
+<TextBlock Text="Colour contrast"/><ComboBox x:Name="ReadingColors" AutomationProperties.Name="Colour contrast" Margin="0,5,0,8" SelectionChanged="Appearance_Changed"><ComboBoxItem Content="Windows default" Tag="system"/><ComboBoxItem Content="Black on white" Tag="light"/><ComboBoxItem Content="White on black" Tag="dark"/><ComboBoxItem Content="Yellow on black" Tag="yellow"/><ComboBoxItem Content="Black on cream" Tag="cream"/></ComboBox>
+<TextBlock Text="Windows high contrast takes priority over custom colours." TextWrapping="Wrap" Margin="0,0,0,12"/>
+<TextBlock Text="Preview"/><Border BorderBrush="Gray" BorderThickness="1" Margin="0,5" Padding="12"><TextBlock x:Name="AppearancePreview" Text="Readable text — نص واضح — Texte lisible" TextWrapping="Wrap" AutomationProperties.Name="Reading appearance preview"/></Border>
 </StackPanel></ScrollViewer></TabItem>
 <TabItem Header="OCR"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
 <TextBlock Text="Default OCR language profile"/><ComboBox x:Name="Languages" Margin="0,5,0,12" AutomationProperties.Name="Default OCR language profile"><ComboBoxItem Content="Arabic" Tag="ara"/><ComboBoxItem Content="English" Tag="eng"/><ComboBoxItem Content="French" Tag="fra"/><ComboBoxItem Content="Arabic + English" Tag="ara+eng"/><ComboBoxItem Content="Arabic + English + French" Tag="ara+eng+fra"/></ComboBox>

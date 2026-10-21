@@ -29,6 +29,7 @@ public partial class App : Application
     {
         if (sender is not Window window || !ReferenceEquals(e.OriginalSource, window)) return;
         Services.UiLanguage.Apply(window);
+        Services.ReadingAppearance.Apply(window, Services.AppSettings.Load());
         var area = SystemParameters.WorkArea;
         window.MinWidth = Math.Min(window.MinWidth, area.Width);
         window.MinHeight = Math.Min(window.MinHeight, area.Height);

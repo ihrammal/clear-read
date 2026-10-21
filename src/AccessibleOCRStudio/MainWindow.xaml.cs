@@ -10,7 +10,7 @@ namespace AccessibleOCRStudio;
 
 public partial class MainWindow : Window
 {
-    private const string AppVersion = "1.0.0";
+    private static string AppVersion => typeof(MainWindow).Assembly.GetName().Version!.ToString(3);
     private readonly WelcomeService _welcome = new();
     private readonly LocalOcrService _ocr = new();
     private readonly ExportService _export = new();
@@ -37,9 +37,42 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent(); LiveRegionAnnouncements.Attach(StatusText);
+        InitializeComponent(); LiveRegionAnnouncements.Attach(StatusText, DocumentText);
         foreach (var item in new[] { UndoMenu, RedoMenu, CutMenu, CopyMenu, PasteMenu, SelectAllMenu }) item.CommandTarget = DocumentText;
+        DocumentText.CommandBindings.Add(new CommandBinding(ApplicationCommands.Copy, CopyOrCut_Executed, ClipboardCommand_CanExecute));
+        DocumentText.CommandBindings.Add(new CommandBinding(ApplicationCommands.Cut, CopyOrCut_Executed, ClipboardCommand_CanExecute));
         Deactivated += (_, _) => { _altPressed = false; _altUsedWithOtherKey = false; };
+        Loaded += (_, _) => SystemParameters.StaticPropertyChanged += SystemAppearanceChanged;
+        Unloaded += (_, _) => SystemParameters.StaticPropertyChanged -= SystemAppearanceChanged;
+        SyncAccessibilityMenu();
+    }
+
+    private void SystemAppearanceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SystemParameters.HighContrast)) Dispatcher.Invoke(SyncAccessibilityMenu);
+    }
+
+    private void ClipboardCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+    { e.CanExecute = true; e.Handled = true; }
+
+    private void CopyOrCut_Executed(object sender, ExecutedRoutedEventArgs e)
+    {
+        e.Handled = true;
+        if (DocumentText.SelectionLength == 0)
+        {
+            StatusText.Text = UiLanguage.T("Select text before using Cut or Copy.");
+            DocumentText.Focus();
+            return;
+        }
+        try
+        {
+            Clipboard.SetText(DocumentText.SelectedText, TextDataFormat.UnicodeText);
+            if (e.Command == ApplicationCommands.Cut) DocumentText.SelectedText = string.Empty;
+            StatusText.Text = UiLanguage.T(e.Command == ApplicationCommands.Cut ? "Selected text cut." : "Selected text copied.");
+        }
+        catch (System.Runtime.InteropServices.ExternalException)
+        { DialogGuard.Show(this, UiLanguage.T("The clipboard is busy. Try again.")); }
+        DocumentText.Focus();
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -317,8 +350,10 @@ public partial class MainWindow : Window
         System.Windows.Automation.AutomationProperties.SetLiveSetting(StatusText, _settings.AnnounceOcrProgress ? System.Windows.Automation.AutomationLiveSetting.Polite : System.Windows.Automation.AutomationLiveSetting.Off);
         StatusText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(ExperienceMessages.Language(_settings.MessageLanguage));
         // UI Automation and system contrast remain available to every user.
-        DocumentText.FontSize = _settings.AccessibleReadingMode ? Math.Max(18, SystemFonts.MessageFontSize) : SystemFonts.MessageFontSize;
-        DocumentText.Padding = new Thickness(_settings.AccessibleReadingMode ? 8 : 2);
+        ReadingAppearance.Apply(this, _settings);
+        ReadingAppearance.ApplyDocument(DocumentText, _settings);
+        ApplicationStatusBar.Visibility = _settings.ShowStatusBar ? Visibility.Visible : Visibility.Collapsed;
+        ShowStatusBarMenu.IsChecked = _settings.ShowStatusBar;
     }
     private string SuggestedName(string ext) => (_currentFile is null ? "recognized-document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile)) + "." + ext;
     private void Help_Click(object s, RoutedEventArgs e) => OpenDoc("help/index.html");
@@ -428,7 +463,27 @@ public partial class MainWindow : Window
     }
 
     private void FocusDocument_Click(object sender, RoutedEventArgs e) => DocumentText.Focus();
-    private void FocusStatus_Click(object sender, RoutedEventArgs e) => StatusText.Focus();
+    private void FocusStatus_Click(object sender, RoutedEventArgs e)
+    {
+        if (_settings.ShowStatusBar) StatusText.Focus();
+        else DialogGuard.Show(this, StatusText.Text, UiLanguage.T("Current status"));
+    }
+
+    private void ShowStatusBar_Click(object sender, RoutedEventArgs e)
+    {
+        if (!ShowStatusBarMenu.IsChecked && StatusText.IsKeyboardFocusWithin) DocumentText.Focus();
+        _settings.ShowStatusBar = ShowStatusBarMenu.IsChecked;
+        SyncAccessibilityMenu();
+        _settings.Save();
+    }
+
+    private void ReadingAppearance_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new SettingsWindow(_settings) { Owner = this };
+        window.OpenLowVision();
+        if (ShowDialogReturningFocus(window) == true)
+        { UiLanguage.Configure(_settings); UiLanguage.Apply(this); SyncAccessibilityMenu(); }
+    }
 
     private bool IsMenuActive => ApplicationMenu.IsKeyboardFocusWithin ||
         ApplicationMenu.Items.OfType<MenuItem>().Any(item => item.IsSubmenuOpen);
@@ -440,6 +495,20 @@ public partial class MainWindow : Window
         DocumentText.Focus();
     }
 
+    internal void CloseMenuLevel()
+    {
+        MenuItem? deepest = null;
+        void Visit(ItemsControl parent)
+        {
+            foreach (var item in parent.Items.OfType<MenuItem>().Where(item => item.IsSubmenuOpen))
+            { deepest = item; Visit(item); }
+        }
+        Visit(ApplicationMenu);
+        if (deepest is null) { LeaveMenu(); return; }
+        deepest.IsSubmenuOpen = false;
+        deepest.Focus();
+    }
+
     private void ToggleMenu()
     {
         if (IsMenuActive) { LeaveMenu(); return; }
@@ -449,7 +518,7 @@ public partial class MainWindow : Window
 
     private void ApplicationMenu_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Alt or Escape leaves menu navigation. Tab must not jump to the editor/status.
+        // Tab stays within menu navigation; Escape closes one submenu level.
         if (e.Key == Key.Tab) e.Handled = true;
     }
 
@@ -480,14 +549,14 @@ public partial class MainWindow : Window
         if (key == Key.Tab && !IsMenuActive &&
             (Keyboard.Modifiers == ModifierKeys.None || Keyboard.Modifiers == ModifierKeys.Shift))
         {
-            if (DocumentText.IsKeyboardFocusWithin) StatusText.Focus();
+            if (_settings.ShowStatusBar && DocumentText.IsKeyboardFocusWithin) StatusText.Focus();
             else DocumentText.Focus();
             e.Handled = true;
             return;
         }
         if (key == Key.Escape && IsMenuActive)
         {
-            LeaveMenu(); e.Handled = true; return;
+            CloseMenuLevel(); e.Handled = true; return;
         }
         if (key == Key.F10 && Keyboard.Modifiers == ModifierKeys.None)
         {

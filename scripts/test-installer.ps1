@@ -6,7 +6,9 @@ $AllowedRoot = [IO.Path]::GetFullPath((Join-Path $Root '.tools')) + [IO.Path]::D
 if (-not $TestRoot.StartsWith($AllowedRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Installer test target is outside the project tools directory.' }
 if (Test-Path $TestRoot) { throw 'Installer test directory already exists. Inspect the previous test before retrying.' }
 $Suffix = if ($ProductionPackage) { '' } else { '-QA' }
-$Installer = Join-Path $Root "artifacts\TextBridge-Setup-1.0.1$Suffix.exe"
+[xml]$Project = Get-Content (Join-Path $Root 'src/AccessibleOCRStudio/AccessibleOCRStudio.csproj')
+$Version = [string]$Project.Project.PropertyGroup.Version
+$Installer = Join-Path $Root "artifacts\TextBridge-Setup-$Version$Suffix.exe"
 if (-not (Test-Path $Installer)) { throw 'Build the isolated QA installer first with build-installer.ps1 -TestInstall.' }
  $AppIdentity = if ($ProductionPackage) { '{9A9C570A-BA44-49B6-95E4-73B724DD0A60}_is1' } else { 'TextBridge-Isolated-QA_is1' }
 $UserRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity"

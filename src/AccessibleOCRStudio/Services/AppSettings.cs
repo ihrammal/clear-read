@@ -11,6 +11,12 @@ public sealed class AppSettings
     public bool PlayExitSound { get; set; } = true;
     public bool ShowWelcomeMessage { get; set; } = true;
     public bool AnnounceOcrProgress { get; set; } = true;
+    public bool ShowStatusBar { get; set; } = false;
+    public string DocumentFontFamily { get; set; } = "Segoe UI";
+    public double DocumentFontSize { get; set; } = 18;
+    public double InterfaceFontSize { get; set; } = 14;
+    public bool DocumentBold { get; set; } = false;
+    public string ReadingColors { get; set; } = "system";
     public bool CheckUpdatesOnStartup { get; set; } = true;
     public bool ScreenReaderOptimization { get; set; } = true;
     public bool AccessibleReadingMode { get; set; } = true;

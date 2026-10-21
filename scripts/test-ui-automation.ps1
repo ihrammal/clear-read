@@ -433,7 +433,9 @@ if ($item -and (Invoke-Element $item)) {
     if ($dlg) {
         Pass 'Help > About opens the About message box'
         $text = (Get-TextBlocks $dlg) -join ' '
-        if ($text -match '1\.0\.1') { Pass 'About box reports version 1.0.1' } else { Fail "About box text did not contain 1.0.1: '$text'" }
+        [xml]$project = Get-Content (Join-Path $Root 'src/AccessibleOCRStudio/AccessibleOCRStudio.csproj')
+        $expectedVersion = [string]$project.Project.PropertyGroup.Version
+        if ($text -match [regex]::Escape($expectedVersion)) { Pass "About box reports version $expectedVersion" } else { Fail "About box text did not contain ${expectedVersion}: '$text'" }
         if ($text -match 'TextBridge') { Pass 'About box identifies the TextBridge product' } else { Fail "About box text missing product name: '$text'" }
         if (Close-MessageBox $procId 'About TextBridge' 'OK') { Pass 'About box can be dismissed' } else { Fail 'About box could not be dismissed' }
     } else { Fail 'About message box did not appear' }

@@ -59,7 +59,9 @@ internal static class Program
         Directory.CreateDirectory(temp);
         try
         {
-            if (!args.Contains("--api-checks-only")) { RevisionChecks.Run(temp, Check); Run(temp); }
+            if (args.Contains("--accessibility-checks-only"))
+            { AccessibilityChecks.Run(temp, Check); Console.WriteLine($"All {passed} checks passed."); return 0; }
+            if (!args.Contains("--api-checks-only")) { AccessibilityChecks.Run(temp, Check); RevisionChecks.Run(temp, Check); Run(temp); }
             OpenAiChecks.Run(temp, Check);
             ProviderChecks.Run(temp, Check);
             Console.WriteLine($"All {passed} checks passed.");

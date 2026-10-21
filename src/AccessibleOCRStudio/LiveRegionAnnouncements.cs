@@ -7,7 +7,7 @@ namespace AccessibleOCRStudio;
 
 internal static class LiveRegionAnnouncements
 {
-    public static void Attach(TextBlock text)
+    public static void Attach(TextBlock text, System.Windows.UIElement? fallback = null)
     {
         var descriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
         EventHandler changed = (_, _) =>
@@ -15,7 +15,8 @@ internal static class LiveRegionAnnouncements
                 if (!text.IsLoaded) return;
                 var message = text.Text ?? string.Empty;
                 if (AutomationProperties.GetLiveSetting(text) == AutomationLiveSetting.Off) return;
-                var peer = UIElementAutomationPeer.FromElement(text) ?? UIElementAutomationPeer.CreatePeerForElement(text);
+                var target = text.IsVisible || fallback is null ? (System.Windows.UIElement)text : fallback;
+                var peer = UIElementAutomationPeer.FromElement(target) ?? UIElementAutomationPeer.CreatePeerForElement(target);
                 if (peer is null) return;
                 var raised = false;
                 try
