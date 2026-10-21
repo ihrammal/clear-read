@@ -49,7 +49,7 @@ internal static class Program
         if (args.Length == 2 && args[0] == "--prepare-ui-fixtures")
         {
             Directory.CreateDirectory(args[1]);
-            MakeImage(Path.Combine(args[1], "english.png"), "Clear Read\nThe quick brown fox jumps over the lazy dog.\nThis is a keyboard and screen reader test.", false);
+            MakeImage(Path.Combine(args[1], "english.png"), "TextBridge\nThe quick brown fox jumps over the lazy dog.\nThis is a keyboard and screen reader test.", false);
             MakeImage(Path.Combine(args[1], "french.png"), "Reconnaissance de texte\nUne école française pendant été.\nBonjour le monde.", false);
             MakeImage(Path.Combine(args[1], "arabic.png"), "مرحبا بالعالم\nهذا اختبار للتعرف على النص العربي", true);
             Console.WriteLine("Prepared synthetic UI test fixtures.");
@@ -59,7 +59,7 @@ internal static class Program
         Directory.CreateDirectory(temp);
         try
         {
-            if (!args.Contains("--api-checks-only")) Run(temp);
+            if (!args.Contains("--api-checks-only")) { RevisionChecks.Run(temp, Check); Run(temp); }
             OpenAiChecks.Run(temp, Check);
             ProviderChecks.Run(temp, Check);
             Console.WriteLine($"All {passed} checks passed.");
@@ -111,7 +111,7 @@ internal static class Program
         var configuredReport = new ReportProblemWindow(new AppSettings());
         ((TextBox)configuredReport.FindName("Summary")).Text = "Synthetic test";
         ((TextBox)configuredReport.FindName("Actual")).Text = "Synthetic behavior";
-        Check(((Button)configuredReport.FindName("GitHubReport")).IsEnabled && new AppSettings().GitHubRepositoryUrl == "https://github.com/ihrammal/clear-read", "Configured Clear Read repository enables GitHub reporting");
+        Check(((Button)configuredReport.FindName("GitHubReport")).IsEnabled && new AppSettings().GitHubRepositoryUrl == "https://github.com/ihrammal/clear-read", "Configured TextBridge repository enables GitHub reporting");
         ((TextBox)configuredReport.FindName("Summary")).Clear(); ((TextBox)configuredReport.FindName("Actual")).Clear(); configuredReport.Close();
         var main = new MainWindow();
         var editor = (TextBox)main.FindName("DocumentText");
@@ -133,7 +133,7 @@ internal static class Program
             Check(welcome.Language.IetfLanguageTag == language && (welcome.FlowDirection == FlowDirection.RightToLeft) == (language == "ar"), $"{language} welcome screen supplies pronunciation and reading direction");
             welcome.Close();
         }
-        Check(main.Title == "Clear Read", "Main window displays the new Clear Read name");
+        Check(main.Title == "TextBridge", "Main window displays the new TextBridge name");
         var unsaved = typeof(MainWindow).GetProperty("HasUnsavedText", BindingFlags.NonPublic | BindingFlags.Instance)!;
         Check(!(bool)unsaved.GetValue(main)!, "Empty editor has no unsaved text");
         editor.Text = "Recognized text with corrections";
@@ -336,15 +336,15 @@ internal static class Program
         var legacyRoot = Path.Combine(temp, "legacy-appdata");
         Directory.CreateDirectory(Path.Combine(legacyRoot, "Accessible OCR Studio"));
         File.WriteAllText(Path.Combine(legacyRoot, "Accessible OCR Studio", "settings.json"), "{\"OcrLanguages\":\"fra\"}");
-        AppSettings.MigrateFromLegacy(Path.Combine(legacyRoot, "Accessible OCR Studio"), Path.Combine(legacyRoot, "Clear Read"), "settings.json");
-        Check(AppSettings.Load(Path.Combine(legacyRoot, "Clear Read", "settings.json")).OcrLanguages == "fra", "Legacy Accessible OCR Studio settings migrate into the Clear Read folder");
+        AppSettings.MigrateFromLegacy(Path.Combine(legacyRoot, "Accessible OCR Studio"), Path.Combine(legacyRoot, "TextBridge"), "settings.json");
+        Check(AppSettings.Load(Path.Combine(legacyRoot, "TextBridge", "settings.json")).OcrLanguages == "fra", "Legacy Accessible OCR Studio settings migrate into the TextBridge folder");
         var legacyCredentials = Path.Combine(temp, "legacy-credentials");
         var legacyStore = new CredentialService(legacyCredentials);
         legacyStore.Save("TestProvider", key);
         Check(legacyStore.Load("TestProvider") == key, "Legacy credential store writes protected keys");
         var migratedCredentials = Path.Combine(temp, "migrated-credentials");
         CredentialService.MigrateFromLegacy(legacyCredentials, migratedCredentials);
-        Check(new CredentialService(migratedCredentials).Load("TestProvider") == key, "Legacy credentials migrate into the Clear Read folder");
+        Check(new CredentialService(migratedCredentials).Load("TestProvider") == key, "Legacy credentials migrate into the TextBridge folder");
         var credentialFolder = Path.Combine(temp, "credentials");
         var credentials = new CredentialService(credentialFolder);
         credentials.Save("TestProvider", key);
@@ -409,7 +409,7 @@ internal static class Program
                         new Typeface(new System.Windows.Media.FontFamily("Segoe UI"), FontStyles.Normal, bold ? FontWeights.Bold : FontWeights.Normal, FontStretches.Normal), font, brush, 1);
                     d.DrawText(f,new Point(rtl ? size.W-80 : 80,y));
                 }
-                Text("Clear Read", shortCard ? 42 : 70, shortCard ? 60 : 76,light,false,true);
+                Text("TextBridge", shortCard ? 42 : 70, shortCard ? 60 : 76,light,false,true);
                 Text(arabic ? "اقرأ. عدّل. احفظ." : "Read. Edit. Save.",shortCard ? 140 : size.H == 1920 ? 300 : 230,shortCard ? 64 : 76,mint,arabic,true);
                 var start = shortCard ? 245 : size.H == 1920 ? 440 : 375;
                 Text(arabic ? "حوّل الصور والمستندات الممسوحة" : "Turn images and scanned documents",start,shortCard ? 32 : 38,light,arabic);
@@ -610,6 +610,7 @@ internal static class Program
         public void Report(string value) => messages.Add(value);
     }
 }
+
 
 
 

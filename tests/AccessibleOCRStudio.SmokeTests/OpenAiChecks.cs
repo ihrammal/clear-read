@@ -39,7 +39,7 @@ internal static class OpenAiChecks
         }
         service.TestConnectionAsync(Allowed(),key).GetAwaiter().GetResult();
         using (var probe = JsonDocument.Parse(handler.RequestBody!))
-            check(handler.Method==HttpMethod.Post && handler.Url=="https://api.openai.com/v1/responses" && probe.RootElement.GetProperty("input").GetString()=="Clear Read API connection test." && !handler.RequestBody.Contains(original),"Test API key checks actual generation using only a fixed non-document sample");
+            check(handler.Method==HttpMethod.Post && handler.Url=="https://api.openai.com/v1/responses" && probe.RootElement.GetProperty("input").GetString()=="TextBridge API connection test." && !handler.RequestBody.Contains(original),"Test API key checks actual generation using only a fixed non-document sample");
         foreach(var status in new[] { HttpStatusCode.Unauthorized,HttpStatusCode.Forbidden,HttpStatusCode.NotFound,HttpStatusCode.TooManyRequests,HttpStatusCode.InternalServerError,HttpStatusCode.Redirect })
         {
             handler.Status=status; handler.Body="remote-secret-document-or-key";

@@ -20,7 +20,7 @@ function Test-Archive($Path, $Base, $Expected) {
         foreach ($Entry in $Zip.Entries) {
             $Name = $Entry.FullName.Replace('\', '/')
             if ($Name.EndsWith('/')) { continue }
-            if ($Name.StartsWith('/') -or $Name -match '(^|/)\.\.(/|$)|:|(^|/)(\.git|\.tools|bin|obj)(/|$)' -or $Seen.ContainsKey($Name)) { throw "Unsafe or duplicate archive entry: $Name" }
+            if ($Name.StartsWith('/') -or $Name -match '(^|/)\.\.(/|$)|:|(^|/)(\.git|\.tools)(/|$)' -or $Seen.ContainsKey($Name)) { throw "Unsafe or duplicate archive entry: $Name" }
             $Seen[$Name] = $true
             if (-not $Expected.ContainsKey($Name)) { throw "Unexpected archive entry: $Name" }
             $File = Join-Path $Base $Name
@@ -40,18 +40,20 @@ foreach ($Directory in @('src','tests','scripts','help','resources','installer',
         ForEach-Object { $SourceFiles[[IO.Path]::GetRelativePath($Root, $_.FullName).Replace('\','/')] = $true }
 }
 foreach ($Name in @('README.md','LICENSE','.gitignore','.gitattributes','global.json')) { $SourceFiles[$Name] = $true }
-Test-Archive (Join-Path $Artifacts "ClearRead-Source-$Version.zip") $Root $SourceFiles
+Test-Archive (Join-Path $Artifacts "TextBridge-Source-$Version.zip") $Root $SourceFiles
 $Publish = Join-Path $Root 'publish'
 $PublishedFiles = @{}
-Get-ChildItem -LiteralPath $Publish -Recurse -File -Force | ForEach-Object { $PublishedFiles[[IO.Path]::GetRelativePath($Publish, $_.FullName).Replace('\','/')] = $true }
-foreach ($Required in @('ClearRead.exe','ocr/tesseract.exe','ocr/tessdata/ara.traineddata','ocr/tessdata/eng.traineddata','ocr/tessdata/fra.traineddata','ocr/tessdata/osd.traineddata','pdf/pdftoppm.exe','pdf/pdftotext.exe','image/magick.exe','help/index.html','licenses/ClearRead-LICENSE.txt','licenses/THIRD-PARTY-NOTICES.txt','licenses/native/notice-origins.json','licenses/native/poppler-dependencies/libfreetype6/FTL.TXT')) {
+Get-ChildItem -LiteralPath $Publish -Recurse -File -Force |
+    Where-Object { $_.Name -notlike 'ClearRead.*' -and $_.Name -ne 'ClearRead-LICENSE.txt' } |
+    ForEach-Object { $PublishedFiles[[IO.Path]::GetRelativePath($Publish, $_.FullName).Replace('\','/')] = $true }
+foreach ($Required in @('TextBridge.exe','ocr/tesseract.exe','ocr/tessdata/ara.traineddata','ocr/tessdata/eng.traineddata','ocr/tessdata/fra.traineddata','ocr/tessdata/osd.traineddata','pdf/pdftoppm.exe','pdf/pdftotext.exe','image/magick.exe','help/index.html','licenses/TextBridge-LICENSE.txt','licenses/THIRD-PARTY-NOTICES.txt','licenses/native/notice-origins.json','licenses/native/poppler-dependencies/libfreetype6/FTL.TXT')) {
     if (-not $PublishedFiles.ContainsKey($Required)) { throw "Publish missing required runtime file: $Required" }
 }
-Test-Archive (Join-Path $Artifacts "ClearRead-$Version-win-x64.zip") $Publish $PublishedFiles
-$RuntimeConfig = Get-Content -LiteralPath (Join-Path $Publish "ClearRead.runtimeconfig.json") -Raw | ConvertFrom-Json
+Test-Archive (Join-Path $Artifacts "TextBridge-$Version-win-x64.zip") $Publish $PublishedFiles
+$RuntimeConfig = Get-Content -LiteralPath (Join-Path $Publish "TextBridge.runtimeconfig.json") -Raw | ConvertFrom-Json
 if (@($RuntimeConfig.runtimeOptions.includedFrameworks | Where-Object { $_.version -ne "8.0.32" }).Count -or @($RuntimeConfig.runtimeOptions.includedFrameworks).Count -ne 2) { throw "Published .NET/Windows Desktop runtime is not the reviewed 8.0.32 version." }
-$App = Get-Item -LiteralPath (Join-Path $Publish 'ClearRead.exe')
-$Installer = Get-Item -LiteralPath (Join-Path $Artifacts "ClearRead-Setup-$Version.exe")
+$App = Get-Item -LiteralPath (Join-Path $Publish 'TextBridge.exe')
+$Installer = Get-Item -LiteralPath (Join-Path $Artifacts "TextBridge-Setup-$Version.exe")
 if ($App.VersionInfo.ProductVersion.Trim() -ne $Version -or $Installer.VersionInfo.ProductVersion.Trim() -ne $Version) { throw 'Executable version differs from source.' }
 if ($Refresh) {
     if ($Manifest.published) { throw 'Do not rewrite metadata for an already published release.' }

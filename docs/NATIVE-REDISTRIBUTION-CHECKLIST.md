@@ -1,7 +1,7 @@
 # Native runtime redistribution review — Clear Read
 
 This is an inventory of unfinished release work, not a completed legal audit.
-Clear Read source is MIT. Bundled components retain their own licenses.
+The revised Clear Read code is free for noncommercial use under LICENSE. Earlier MIT-licensed copies retain that license. Bundled components retain their own licenses.
 
 | Component | Observed version | Local notices | Work before public binary distribution |
 | --- | --- | --- | --- |

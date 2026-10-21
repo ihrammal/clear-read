@@ -1,7 +1,7 @@
-<Window x:Class="AccessibleOCRStudio.SettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Clear Read Settings" Height="600" Width="720" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+<Window x:Class="AccessibleOCRStudio.SettingsWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="TextBridge Settings" Height="600" Width="720" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
 <Grid Margin="16"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
 <TabControl x:Name="Tabs" AutomationProperties.Name="Settings categories">
-<TabItem Header="Accessibility"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
+<TabItem Header="General"><StackPanel Margin="12"><TextBlock Text="Interface language / لغة الواجهة"/><ComboBox x:Name="InterfaceLanguage" AutomationProperties.Name="Interface language / لغة الواجهة" Margin="0,8"><ComboBoxItem Content="Windows language / لغة Windows" Tag="auto"/><ComboBoxItem Content="العربية" Tag="ar"/><ComboBoxItem Content="English" Tag="en"/></ComboBox><TextBlock Text="Language changes apply as soon as you save." TextWrapping="Wrap"/></StackPanel></TabItem><TabItem Header="Accessibility"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
 <CheckBox x:Name="ScreenReader" Content="Screen reader support is always enabled" IsEnabled="False" Margin="0,5"/>
 <CheckBox x:Name="AnnounceProgress" Content="Announce OCR progress" Margin="0,5"/>
 <CheckBox x:Name="AccessibleReading" Content="Accessible reading mode (larger document text and spacing)" Margin="0,5"/>
@@ -10,18 +10,21 @@
 <CheckBox x:Name="ExitSound" Content="Play exit sound" Margin="0,5"/>
 <TextBlock Text="Welcome, goodbye and recognition message language" Margin="0,12,0,0"/>
 <ComboBox x:Name="MessageLanguage" AutomationProperties.Name="Welcome, goodbye and recognition message language" Margin="0,5"><ComboBoxItem Content="Windows language / لغة Windows / Langue Windows" Tag="auto"/><ComboBoxItem Content="العربية" Tag="ar"/><ComboBoxItem Content="English" Tag="en"/><ComboBoxItem Content="Français" Tag="fr"/></ComboBox>
-<TextBlock Text="Menus and detailed progress messages are in English." TextWrapping="Wrap"/>
+
 <CheckBox x:Name="WelcomeMessage" Content="Show welcome message" Margin="0,5"/>
 </StackPanel></ScrollViewer></TabItem>
 <TabItem Header="OCR"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12">
 <TextBlock Text="Default OCR language profile"/><ComboBox x:Name="Languages" Margin="0,5,0,12" AutomationProperties.Name="Default OCR language profile"><ComboBoxItem Content="Arabic" Tag="ara"/><ComboBoxItem Content="English" Tag="eng"/><ComboBoxItem Content="French" Tag="fra"/><ComboBoxItem Content="Arabic + English" Tag="ara+eng"/><ComboBoxItem Content="Arabic + English + French" Tag="ara+eng+fra"/></ComboBox>
-<CheckBox x:Name="PreferDigital" Content="Use existing PDF text when available" Margin="0,5"/>
+<CheckBox x:Name="PreserveLayout" Content="Keep line breaks and spacing in recognized text and exports" Margin="0,5"/><TextBlock Text="Word keeps headings and paragraphs; HTML keeps spacing. Searchable PDF keeps the original page appearance. Complex tables may need manual editing." TextWrapping="Wrap"/><CheckBox x:Name="PreferDigital" Content="Use existing PDF text when available" Margin="0,5"/>
 <CheckBox x:Name="AutoRotate" Content="Automatic orientation assistance" Margin="0,5"/>
 <CheckBox x:Name="Deskew" Content="Deskew pages when preprocessing engine is available" Margin="0,5"/>
 <CheckBox x:Name="Grayscale" Content="Convert images to grayscale before OCR when preprocessing engine is available" Margin="0,5"/>
 <TextBlock Text="Recognition mode" Margin="0,12,0,0"/><ComboBox x:Name="OcrMode" AutomationProperties.Name="Recognition mode" Margin="0,5"><ComboBoxItem Content="Accurate" Tag="accurate"/><ComboBoxItem Content="Fast" Tag="fast"/></ComboBox>
 </StackPanel></ScrollViewer></TabItem>
-<TabItem Header="Updates"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12"><CheckBox x:Name="CheckUpdates" Content="Check for updates when Clear Read starts" Margin="0,5"/><TextBlock TextWrapping="Wrap" Margin="0,12,0,0" Text="Update checks never send document content. Automatic installation is not enabled in this development version."/></StackPanel></ScrollViewer></TabItem>
+<TabItem Header="Updates"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="12"><TextBlock Text="Update feed address (HTTPS)"/><TextBox x:Name="UpdateFeed" AutomationProperties.Name="Update feed address (HTTPS)" Margin="0,8" FlowDirection="LeftToRight"/><CheckBox x:Name="CheckUpdates" Content="Check for updates when TextBridge starts" Margin="0,5"/><TextBlock TextWrapping="Wrap" Margin="0,12,0,0" Text="When you accept an available update, TextBridge downloads and installs it automatically. Save your work before installation. Update checks never send document content."/></StackPanel></ScrollViewer></TabItem>
 </TabControl>
 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0"><Button Content="Save" Width="90" Margin="4" IsDefault="True" Click="Save_Click"/><Button Content="Cancel" Width="90" Margin="4" IsCancel="True"/></StackPanel>
 </Grid></Window>
+
+
+

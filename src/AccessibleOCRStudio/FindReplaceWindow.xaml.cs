@@ -34,7 +34,7 @@ public partial class FindReplaceWindow : Window
         var replaced = _editor.SelectionLength > 0 && string.Equals(_editor.SelectedText, FindText.Text, Comparison);
         if (replaced) _editor.SelectedText = ReplaceText.Text;
         FindNext_Click(sender, e);
-        if (replaced) ResultText.Text = ResultText.Text == "Text not found."
+        if (replaced) ResultText.Text = ResultText.Text == Services.UiLanguage.T("Text not found.")
             ? "One occurrence replaced. No further matches."
             : "One occurrence replaced. " + ResultText.Text;
     }
@@ -51,3 +51,4 @@ public partial class FindReplaceWindow : Window
         _editor.Text = sb.ToString(); ResultText.Text = count == 1 ? "1 occurrence replaced." : $"{count} occurrences replaced.";
     }
 }
+

@@ -1,21 +1,30 @@
-MIT License
+TextBridge Noncommercial License
+Copyright (c) 2026 Iman Rammal. All rights reserved.
+Effective for this revised version and later versions distributed with this license.
 
-Copyright (c) 2026 Iman Rammal
+Permission is granted, without charge, to install and use TextBridge for personal,
+educational, charitable, and other noncommercial purposes. Noncommercial means
+use that is not primarily intended for commercial advantage or monetary compensation.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Commercial use, including use in a business or paid service, selling, sublicensing,
+and commercial distribution, requires prior written permission from Iman Rammal.
+Contact: iman.rammal@gmail.com.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+You may share unmodified copies for noncommercial purposes if you include this
+license and all third-party notices. No permission to redistribute modified versions
+or relicense TextBridge is granted by this license. All other rights are reserved.
+
+This license applies only to original TextBridge code and assets owned by Iman
+Rammal. Third-party components retain their own licenses and rights; see the
+bundled third-party notices. This license does not restrict rights granted under
+third-party licenses or change the license of copies previously distributed under MIT.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. TO THE EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL
+NOT BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+SOFTWARE OR ITS USE.
+
+ملخص عربي: البرنامج مجاني للاستخدام غير التجاري. يتطلب الاستخدام التجاري إذناً
+كتابياً مسبقاً من إيمان رمال. تحتفظ المكونات الخارجية بتراخيصها الخاصة، ولا يغير
+هذا الترخيص حقوق النسخ التي سبق توزيعها بترخيص MIT. النص الإنجليزي أعلاه هو المرجع.

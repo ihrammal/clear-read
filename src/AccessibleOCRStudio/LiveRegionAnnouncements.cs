@@ -20,7 +20,7 @@ internal static class LiveRegionAnnouncements
                 var raised = false;
                 try
                 {
-                    peer.RaiseNotificationEvent(AutomationNotificationKind.Other, AutomationNotificationProcessing.ImportantMostRecent, message, "Clear Read status");
+                    peer.RaiseNotificationEvent(AutomationNotificationKind.Other, AutomationNotificationProcessing.ImportantMostRecent, message, "TextBridge status");
                     raised = true;
                 }
                 catch { }

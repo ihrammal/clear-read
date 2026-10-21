@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     private UIElement? _menuReturnFocus;
     private CancellationTokenSource? _apiCancellation;
     private bool _busy;
+    private bool _updating;
     private bool _closing;
     private string _savedText = string.Empty;
     private bool HasUnsavedText => DocumentText.Text != _savedText;
@@ -47,11 +48,8 @@ public partial class MainWindow : Window
         SyncAccessibilityMenu();
         var runtime = _diagnostics.Check();
         if (!runtime.CoreOcrReady) StatusText.Text = runtime.Summary;
-        if (_settings.CheckUpdatesOnStartup && !_settings.OfflineOnlyMode && !string.IsNullOrWhiteSpace(_settings.UpdateFeedUrl))
-        {
-            var result = await _updates.CheckAsync(_settings.UpdateFeedUrl, AppVersion);
-            if (result.UpdateAvailable) StatusText.Text = result.Message;
-        }
+        if (_settings.CheckUpdatesOnStartup && !string.IsNullOrWhiteSpace(_settings.UpdateFeedUrl))
+            await UpdateApplicationAsync(false);
     }
 
     private async void Open_Click(object sender, RoutedEventArgs e)
@@ -75,7 +73,7 @@ public partial class MainWindow : Window
     private async void Recognize_Click(object sender, RoutedEventArgs e)
     {
         if (_busy) return;
-        if (_currentFile is null) { DialogGuard.Show(this, ExperienceMessages.Get("openFirst", _settings.MessageLanguage), "Clear Read", MessageBoxButton.OK, MessageBoxImage.Information); return; }
+        if (_currentFile is null) { DialogGuard.Show(this, ExperienceMessages.Get("openFirst", _settings.MessageLanguage), "TextBridge", MessageBoxButton.OK, MessageBoxImage.Information); return; }
         if (!await ConfirmUnsavedTextAsync()) return;
         _busy = true;
         StatusText.Text = ExperienceMessages.Get("started", _settings.MessageLanguage);
@@ -197,7 +195,7 @@ public partial class MainWindow : Window
     {
         var w = new SettingsWindow(_settings) { Owner = this };
         var saved = ShowDialogReturningFocus(w);
-        if (saved == true) { SyncAccessibilityMenu(); StatusText.Text = "Settings saved."; }
+        if (saved == true) { UiLanguage.Configure(_settings); UiLanguage.Apply(this); SyncAccessibilityMenu(); StatusText.Text = UiLanguage.T("Settings saved."); }
     }
 
     private bool? ShowDialogReturningFocus(Window window)
@@ -255,7 +253,7 @@ public partial class MainWindow : Window
         if (DialogGuard.Run(d.ShowDialog) != true) return;
         try
         {
-            _export.SaveAccessibleDocx(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile));
+            _export.SaveAccessibleDocx(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile), _settings.PreserveTextLayout);
             StatusText.Text = $"Exported accessible Word document {System.IO.Path.GetFileName(d.FileName)}.";
         }
         catch (Exception ex) { ShowExportError(ex); }
@@ -268,7 +266,7 @@ public partial class MainWindow : Window
         if (DialogGuard.Run(d.ShowDialog) != true) return;
         try
         {
-            await _export.SaveHtmlAsync(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile));
+            await _export.SaveHtmlAsync(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile), _settings.PreserveTextLayout);
             StatusText.Text = $"Exported accessible HTML {System.IO.Path.GetFileName(d.FileName)}.";
         }
         catch (Exception ex) { ShowExportError(ex); }
@@ -280,7 +278,7 @@ public partial class MainWindow : Window
         if (DialogGuard.Run(d.ShowDialog) != true) return;
         try
         {
-            await _export.SaveMarkdownAsync(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile));
+            await _export.SaveMarkdownAsync(d.FileName, DocumentText.Text, _currentFile is null ? "Recognized document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile), _settings.PreserveTextLayout);
             StatusText.Text = $"Exported Markdown {System.IO.Path.GetFileName(d.FileName)}.";
         }
         catch (Exception ex) { ShowExportError(ex); }
@@ -319,60 +317,65 @@ public partial class MainWindow : Window
         System.Windows.Automation.AutomationProperties.SetLiveSetting(StatusText, _settings.AnnounceOcrProgress ? System.Windows.Automation.AutomationLiveSetting.Polite : System.Windows.Automation.AutomationLiveSetting.Off);
         StatusText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(ExperienceMessages.Language(_settings.MessageLanguage));
         // UI Automation and system contrast remain available to every user.
-        ScreenReaderMenu.IsChecked = true;
         DocumentText.FontSize = _settings.AccessibleReadingMode ? Math.Max(18, SystemFonts.MessageFontSize) : SystemFonts.MessageFontSize;
         DocumentText.Padding = new Thickness(_settings.AccessibleReadingMode ? 8 : 2);
-        AnnounceProgressMenu.IsChecked = _settings.AnnounceOcrProgress;
-        HighContrastMenu.IsChecked = true;
-        AccessibleReadingMenu.IsChecked = _settings.AccessibleReadingMode;
-        StartupSoundMenu.IsChecked = _settings.PlayStartupSound;
-        ExitSoundMenu.IsChecked = _settings.PlayExitSound;
-        WelcomeMessageMenu.IsChecked = _settings.ShowWelcomeMessage;
     }
-    private void AccessibilityToggle_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuItem m || m.Tag is not string key) return;
-        var value = m.IsChecked;
-        switch (key)
-        {
-            case "ScreenReaderOptimization": _settings.ScreenReaderOptimization = value; break;
-            case "AnnounceOcrProgress": _settings.AnnounceOcrProgress = value; break;
-            case "FollowWindowsHighContrast": _settings.FollowWindowsHighContrast = value; break;
-            case "AccessibleReadingMode": _settings.AccessibleReadingMode = value; break;
-            case "PlayStartupSound": _settings.PlayStartupSound = value; break;
-            case "PlayExitSound": _settings.PlayExitSound = value; break;
-            case "ShowWelcomeMessage": _settings.ShowWelcomeMessage = value; break;
-        }
-        _settings.Save(); SyncAccessibilityMenu(); StatusText.Text = $"{m.Header}: {(value ? "On" : "Off")}.";
-    }
-
     private string SuggestedName(string ext) => (_currentFile is null ? "recognized-document" : System.IO.Path.GetFileNameWithoutExtension(_currentFile)) + "." + ext;
     private void Help_Click(object s, RoutedEventArgs e) => OpenDoc("help/index.html");
     private void Shortcuts_Click(object s, RoutedEventArgs e) => OpenDoc("help/shortcuts.html");
-    private async void CheckUpdates_Click(object sender, RoutedEventArgs e)
-    {
-        if (_settings.OfflineOnlyMode)
-        {
-            StatusText.Text = "Update checking is disabled while offline-only mode is on.";
-            DialogGuard.Show(this, "Update checking is disabled while offline-only mode is on. Turn it off in Tools > API and Privacy Settings, then try again.", "Clear Read Updates", MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-        StatusText.Text = "Checking for updates.";
-        var result = await _updates.CheckAsync(_settings.UpdateFeedUrl, AppVersion);
-        StatusText.Text = result.Message;
-        DialogGuard.Show(this, result.Message, "Clear Read Updates", MessageBoxButton.OK, result.UpdateAvailable ? MessageBoxImage.Information : MessageBoxImage.None);
-        if (result.UpdateAvailable && !string.IsNullOrWhiteSpace(result.ReleaseUrl))
-        {
-            var answer = DialogGuard.Show(this, "Open the release page in your default browser?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (answer == MessageBoxResult.Yes) Process.Start(new ProcessStartInfo(result.ReleaseUrl) { UseShellExecute = true });
-        }
-    }
+    private async void CheckUpdates_Click(object sender, RoutedEventArgs e) => await UpdateApplicationAsync(true);
 
+    private async Task UpdateApplicationAsync(bool showResult)
+    {
+        if (_busy || _updating || _closing) return;
+        _updating = true;
+        var wasEnabled = DocumentText.IsEnabled;
+        var lockedForInstall = false;
+        try
+        {
+            StatusText.Text = UiLanguage.T("Checking for updates.");
+            var result = await _updates.CheckAsync(_settings.UpdateFeedUrl, AppVersion);
+            if (_closing || _allowClose) return;
+            StatusText.Text = UiLanguage.T(result.Message);
+            if (!result.UpdateAvailable)
+            {
+                if (showResult) DialogGuard.Show(this, result.Message, "TextBridge Updates");
+                return;
+            }
+            var consent = DialogGuard.Show(this,
+                UiLanguage.T("Version {0} is available. Download and install it now? Your work will be saved or reviewed before installation. Windows may ask for administrator permission.").Replace("{0}", result.LatestVersion),
+                UiLanguage.T("TextBridge Updates"), MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            if (consent != MessageBoxResult.Yes) { StatusText.Text = UiLanguage.T("Update cancelled. Nothing was downloaded or installed."); return; }
+            StatusText.Text = UiLanguage.T("Downloading update.");
+            var installer = await _updates.DownloadAsync(result);
+            if (_closing || _allowClose) return;
+            if (_busy || _apiCancellation is not null) { StatusText.Text = UiLanguage.T("Update downloaded. Check again after the current operation finishes."); return; }
+            _busy = true;
+            lockedForInstall = true;
+            DocumentText.IsEnabled = false;
+            ApplicationMenu.IsEnabled = false;
+            if (!await ConfirmUnsavedTextAsync()) return;
+            StatusText.Text = UiLanguage.T("Installing update.");
+            var start = new ProcessStartInfo(installer) { UseShellExecute = true, Verb = "runas" };
+            start.ArgumentList.Add("/SILENT");
+            start.ArgumentList.Add("/NORESTART");
+            start.ArgumentList.Add("/NOCLOSEAPPLICATIONS");
+            start.ArgumentList.Add("/DIR=" + AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar));
+            if (Process.Start(start) is null) throw new IOException("The installer could not be started.");
+            _allowClose = true;
+            Close();
+        }
+        catch (Exception ex)
+        {
+            if (!_closing) DialogGuard.Show(this, UiLanguage.T("The update could not be installed. Your document is unchanged.") + "\n" + ex.Message, "TextBridge Updates", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally { if (lockedForInstall) _busy = false; _updating = false; DocumentText.IsEnabled = wasEnabled; ApplicationMenu.IsEnabled = true; }
+    }
 
     private async void ExportSearchablePdf_Click(object sender, RoutedEventArgs e)
     {
         if (_busy) return;
-        if (_currentFile is null) { DialogGuard.Show(this, ExperienceMessages.Get("openFirst", _settings.MessageLanguage), "Clear Read", MessageBoxButton.OK, MessageBoxImage.Information); return; }
+        if (_currentFile is null) { DialogGuard.Show(this, ExperienceMessages.Get("openFirst", _settings.MessageLanguage), "TextBridge", MessageBoxButton.OK, MessageBoxImage.Information); return; }
         var d = new SaveFileDialog { Filter = "Searchable PDF|*.pdf", DefaultExt = ".pdf", FileName = SuggestedName("searchable.pdf") };
         if (DialogGuard.Run(d.ShowDialog) != true) return;
         _busy = true;
@@ -408,17 +411,20 @@ public partial class MainWindow : Window
     private void PreviousLowConfidence_Click(object sender, RoutedEventArgs e) => MoveLowConfidence(-1);
     private void MoveLowConfidence(int direction)
     {
-        var words = _lastRecognition?.LowConfidenceWords(_settings.LowConfidenceThreshold).ToList();
+        var words = _lastRecognition?.ReviewLocations(DocumentText.Text, _settings.LowConfidenceThreshold);
         if (words is null || words.Count == 0)
         {
-            StatusText.Text = "No word-level low-confidence data is available for this document.";
+            StatusText.Text = UiLanguage.T("No words to check were found. If you edited the text, recognize the document again to refresh review locations.");
             return;
         }
-        _lowConfidenceIndex = (_lowConfidenceIndex + direction + words.Count) % words.Count;
-        var word = words[_lowConfidenceIndex];
-        var start = DocumentText.Text.IndexOf(word.Text, StringComparison.Ordinal);
-        if (start >= 0) { DocumentText.Focus(); DocumentText.Select(start, word.Text.Length); }
-        StatusText.Text = $"Low-confidence word {_lowConfidenceIndex + 1} of {words.Count}: {word.Text}, confidence {word.Confidence:0} percent.";
+        _lowConfidenceIndex = _lowConfidenceIndex < 0
+            ? (direction < 0 ? words.Count - 1 : 0)
+            : (_lowConfidenceIndex + direction + words.Count) % words.Count;
+        var (word, start) = words[_lowConfidenceIndex];
+        DocumentText.Focus();
+        DocumentText.Select(start, word.Text.Length);
+        DocumentText.ScrollToLine(DocumentText.GetLineIndexFromCharacterIndex(start));
+        StatusText.Text = UiLanguage.T($"Word to check {_lowConfidenceIndex + 1} of {words.Count}: {word.Text}. Recognition confidence: {word.Confidence:0} percent.");
     }
 
     private void FocusDocument_Click(object sender, RoutedEventArgs e) => DocumentText.Focus();
@@ -487,14 +493,6 @@ public partial class MainWindow : Window
         {
             ToggleMenu(); e.Handled = true; return;
         }
-        if (key == Key.A && Keyboard.Modifiers == ModifierKeys.Alt)
-        {
-            var menu = ApplicationMenu.Items.OfType<MenuItem>().First(item => Equals(item.Header, "_Accessibility"));
-            menu.Focus();
-            menu.IsSubmenuOpen = true;
-            e.Handled = true;
-            return;
-        }
         var ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
         var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
         if (ctrl && e.Key == Key.O) { Open_Click(sender, e); e.Handled = true; }
@@ -512,8 +510,8 @@ public partial class MainWindow : Window
         else if (e.Key == Key.F4) { NextLowConfidence_Click(sender, e); e.Handled = true; }
     }
 
-    private void About_Click(object s, RoutedEventArgs e) => DialogGuard.Show(this, "Clear Read " + AppVersion + "\nAccessibility-first OCR for Windows\nBy Iman Rammal", "About Clear Read");
-    private void OpenDoc(string rel) { var p = System.IO.Path.Combine(AppContext.BaseDirectory, rel); if (System.IO.File.Exists(p)) Process.Start(new ProcessStartInfo(p) { UseShellExecute = true }); else DialogGuard.Show(this, "Help file is not installed yet."); }
+    private void About_Click(object s, RoutedEventArgs e) => DialogGuard.Show(this, "TextBridge " + AppVersion + "\n" + UiLanguage.T("Accessible text recognition for Windows") + "\n" + UiLanguage.T("Free for noncommercial use. Commercial use requires permission.") + "\n" + UiLanguage.T("By Iman Rammal"), "About TextBridge");
+    private void OpenDoc(string rel) { if (UiLanguage.IsArabic) rel = rel.Replace("help/", "help/ar/"); var p = System.IO.Path.Combine(AppContext.BaseDirectory, rel); if (System.IO.File.Exists(p)) Process.Start(new ProcessStartInfo(p) { UseShellExecute = true }); else DialogGuard.Show(this, "Help file is not installed yet."); }
     private async void Exit_Click(object s, RoutedEventArgs e) { await CloseWithFarewellAsync(); }
     private async void Window_Closing(object? s, CancelEventArgs e) { if (_allowClose) return; e.Cancel = true; await CloseWithFarewellAsync(); }
     private async Task<bool> ConfirmUnsavedTextAsync()
@@ -521,7 +519,7 @@ public partial class MainWindow : Window
         if (!HasUnsavedText) return true;
         var answer = DialogGuard.Show(this,
             ExperienceMessages.Get("unsaved", _settings.MessageLanguage),
-            "Clear Read — Unsaved text", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+            "TextBridge — Unsaved text", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
         return answer == MessageBoxResult.No || (answer == MessageBoxResult.Yes && await SaveDocumentTextAsync() && !HasUnsavedText);
     }
 
@@ -542,6 +540,11 @@ public partial class MainWindow : Window
         finally { _closing = false; }
     }
 }
+
+
+
+
+
 
 
 

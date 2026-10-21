@@ -1,4 +1,4 @@
-# UI Automation audit for Clear Read.
+# UI Automation audit for TextBridge.
 # Drives the published Windows app with real keyboard input and verifies the
 # accessibility properties, focus order, dialogs, and recognition flow.
 # Usage: scripts\test-ui-automation.ps1 [-ExePath path] [-ImagePath path]
@@ -8,7 +8,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
-if (-not $ExePath) { $ExePath = Join-Path $Root 'publish\ClearRead.exe' }
+if (-not $ExePath) { $ExePath = Join-Path $Root 'publish\TextBridge.exe' }
 if (-not $ImagePath) { $ImagePath = Join-Path $Root 'artifacts\accessibility-tests\english.png' }
 if (-not (Test-Path $ExePath)) { throw "App not found at $ExePath. Run scripts\build-windows.ps1 first." }
 
@@ -204,7 +204,7 @@ function Close-MessageBox($procId, [string]$title, [string]$buttonName) {
 }
 
 # ---------------------------------------------------------------- settings backup
-$settingsPath = Join-Path $env:APPDATA 'Clear Read\settings.json'
+$settingsPath = Join-Path $env:APPDATA 'TextBridge\settings.json'
 $settingsBackup = $null
 if (Test-Path $settingsPath) { $settingsBackup = Get-Content $settingsPath -Raw }
 $corruptPdf = Join-Path $env:TEMP 'clearread-corrupt-test.pdf'
@@ -212,20 +212,20 @@ $corruptPdf = Join-Path $env:TEMP 'clearread-corrupt-test.pdf'
 
 try {
 # ---------------------------------------------------------------- launch
-foreach ($p in (Get-Process -Name ClearRead -ErrorAction SilentlyContinue)) { $p.Kill(); $p.WaitForExit() }
+foreach ($p in (Get-Process -Name TextBridge -ErrorAction SilentlyContinue)) { $p.Kill(); $p.WaitForExit() }
 $proc = Start-Process -FilePath $ExePath -WorkingDirectory (Split-Path $ExePath) -PassThru
 $procId = $proc.Id
 Start-Sleep -Seconds 5
 
-$main = Wait-Window $procId 'Clear Read*' 25000
+$main = Wait-Window $procId 'TextBridge*' 25000
 if ($main) { Pass "Published app launches with top-level window '$($main.Current.Name)'" }
 else { Fail 'Main window was not found'; exit 1 }
 $script:mainWindow = $main
 
 Start-Sleep -Seconds 4
-$main = Wait-Window $procId 'Clear Read' 10000
+$main = Wait-Window $procId 'TextBridge' 10000
 $script:mainWindow = $main
-if ($main -and $main.Current.Name -eq 'Clear Read') { Pass 'Welcome title sequence settles back to Clear Read' }
+if ($main -and $main.Current.Name -eq 'TextBridge') { Pass 'Welcome title sequence settles back to TextBridge' }
 else { Fail "Window title did not settle (was '$($main.Current.Name))'" }
 
 # ---------------------------------------------------------------- accessible names
@@ -427,15 +427,15 @@ if ($item -and (Invoke-Element $item)) {
 
 # ---------------------------------------------------------------- About and diagnostics
 Activate $procId
-$item = Get-MenuItem $main 'Help' 'About Clear Read'
+$item = Get-MenuItem $main 'Help' 'About TextBridge'
 if ($item -and (Invoke-Element $item)) {
-    $dlg = Wait-Window $procId 'About Clear Read' 8000
+    $dlg = Wait-Window $procId 'About TextBridge' 8000
     if ($dlg) {
         Pass 'Help > About opens the About message box'
         $text = (Get-TextBlocks $dlg) -join ' '
-        if ($text -match '1\.0\.0') { Pass 'About box reports version 1.0.0' } else { Fail "About box text did not contain 1.0.0: '$text'" }
-        if ($text -match 'Clear Read') { Pass 'About box identifies the Clear Read product' } else { Fail "About box text missing product name: '$text'" }
-        if (Close-MessageBox $procId 'About Clear Read' 'OK') { Pass 'About box can be dismissed' } else { Fail 'About box could not be dismissed' }
+        if ($text -match '1\.0\.1') { Pass 'About box reports version 1.0.1' } else { Fail "About box text did not contain 1.0.1: '$text'" }
+        if ($text -match 'TextBridge') { Pass 'About box identifies the TextBridge product' } else { Fail "About box text missing product name: '$text'" }
+        if (Close-MessageBox $procId 'About TextBridge' 'OK') { Pass 'About box can be dismissed' } else { Fail 'About box could not be dismissed' }
     } else { Fail 'About message box did not appear' }
 } else { Fail 'Help > About menu item not invokable' }
 
@@ -455,12 +455,12 @@ if ($item -and (Invoke-Element $item)) {
 Activate $procId
 $item = Get-MenuItem $main 'Help' 'Check for Updates'
 if ($item -and (Invoke-Element $item)) {
-    $dlg = Wait-Window $procId 'Clear Read Updates' 8000
+    $dlg = Wait-Window $procId 'TextBridge Updates' 8000
     if ($dlg) {
         $text = (Get-TextBlocks $dlg) -join ' '
         if ($text -match 'offline-only mode is on') { Pass 'Check for Updates respects offline-only mode and explains why it is disabled' }
         else { Fail "Check for Updates message did not explain offline-only mode: '$text'" }
-        if (Close-MessageBox $procId 'Clear Read Updates' 'OK') { Pass 'Update-disabled message can be dismissed' } else { Fail 'Update-disabled message could not be dismissed' }
+        if (Close-MessageBox $procId 'TextBridge Updates' 'OK') { Pass 'Update-disabled message can be dismissed' } else { Fail 'Update-disabled message could not be dismissed' }
     } else { Fail 'Check for Updates did not show the offline-only message' }
 } else { Fail 'Help > Check for Updates menu item not invokable' }
 
@@ -516,7 +516,7 @@ if ($open) {
     Wait-Gone $procId 'Open' 8000 | Out-Null
 } else { Fail 'Ctrl+O did not open a file dialog' }
 
-$main = Wait-Window $procId 'Clear Read' 5000
+$main = Wait-Window $procId 'TextBridge' 5000
 $script:mainWindow = $main
 $status = Find-ById $main 'StatusText'
 if ($status -and $status.Current.Name -like 'Opened*') { Pass "Status reports the opened file: '$($status.Current.Name)'" }
@@ -624,7 +624,7 @@ function Open-DocForRecognition([string]$path, [string]$promptButton) {
         $prompt = Wait-Window $procId '*Unsaved text*' 8000
         if ($prompt) { Press-Button $procId $prompt $promptButton | Out-Null; Wait-Gone $procId '*Unsaved text*' 8000 | Out-Null }
     }
-    $script:mainWindow = Wait-Window $procId 'Clear Read' 5000
+    $script:mainWindow = Wait-Window $procId 'TextBridge' 5000
     return $true
 }
 function Select-Language([string]$label) {
@@ -704,7 +704,7 @@ if ($exited) {
 finally {
     if ($null -ne $settingsBackup) { Set-Content $settingsPath -Value $settingsBackup -Encoding UTF8 }
     elseif (Test-Path $settingsPath) { Remove-Item $settingsPath -Force }
-    foreach ($p in (Get-Process -Name ClearRead -ErrorAction SilentlyContinue)) { $p.Kill() }
+    foreach ($p in (Get-Process -Name TextBridge -ErrorAction SilentlyContinue)) { $p.Kill() }
 }
 
 Write-Output ''

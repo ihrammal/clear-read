@@ -11,6 +11,7 @@ public partial class App : Application
         try
         {
             var settings = Services.AppSettings.Load();
+            Services.UiLanguage.Configure(settings);
             if (!await new Services.WelcomeService().ShowStartupAsync(settings)) { Shutdown(); return; }
             var main = new MainWindow();
             MainWindow = main;
@@ -19,7 +20,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Clear Read — Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(ex.Message, "TextBridge — Startup error", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         }
     }
@@ -27,6 +28,7 @@ public partial class App : Application
     private static void FitWindowToDisplay(object sender, RoutedEventArgs e)
     {
         if (sender is not Window window || !ReferenceEquals(e.OriginalSource, window)) return;
+        Services.UiLanguage.Apply(window);
         var area = SystemParameters.WorkArea;
         window.MinWidth = Math.Min(window.MinWidth, area.Width);
         window.MinHeight = Math.Min(window.MinHeight, area.Height);
@@ -34,3 +36,4 @@ public partial class App : Application
         if (!double.IsNaN(window.Height)) window.Height = Math.Min(window.Height, area.Height);
     }
 }
+

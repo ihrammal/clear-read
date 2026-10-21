@@ -1,19 +1,19 @@
 name: Report a problem
-description: Tell us what happened in Clear Read.
+description: Tell us what happened in TextBridge.
 title: "[Problem] "
 body:
   - type: markdown
     attributes:
       value: |
-        You can also use Help > Report a Problem inside Clear Read.
+        You can also use Help > Report a Problem inside TextBridge.
         Include only sample text you are allowed to share. Do not post passwords, API keys or private documents.
         For a security concern, email iman.rammal@gmail.com instead of posting details publicly.
   - type: input
     id: version
     attributes:
-      label: Clear Read version
-      description: Find this under Help > About Clear Read.
-      placeholder: 1.0.0
+      label: TextBridge version
+      description: Find this under Help > About TextBridge.
+      placeholder: 1.0.1
     validations:
       required: true
   - type: input

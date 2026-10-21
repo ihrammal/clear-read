@@ -1,4 +1,4 @@
-Clear Read - Third-Party Runtime Notice
+TextBridge - Third-Party Runtime Notice
 
 The locally prepared development build includes Tesseract OCR 5.5.3.20260724, tessdata_fast Arabic/English/French/orientation models, and Poppler 26.09.0. Tesseract binaries come from https://github.com/tesseract-ocr/tesseract/releases/tag/5.5.3; models come from https://github.com/tesseract-ocr/tessdata_fast; Windows Poppler binaries come from https://github.com/oschwartz10612/poppler-windows/releases/tag/v26.09.0-0.
 

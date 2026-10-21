@@ -38,7 +38,7 @@ public sealed class OpenAiCorrectionService
             AllowApiDocumentContent = true, AllowApiOcrCorrection = true
         };
         // This explicit test sends only a fixed synthetic string, never the editor text.
-        var result = await RequestTextAsync("Clear Read API connection test.", probeSettings, key, cancellation, true);
+        var result = await RequestTextAsync("TextBridge API connection test.", probeSettings, key, cancellation, true);
         if (string.IsNullOrWhiteSpace(result)) throw new InvalidOperationException("OpenAI returned no test response.");
     }
 

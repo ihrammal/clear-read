@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 [xml]$Project = Get-Content (Join-Path $Root 'src\AccessibleOCRStudio\AccessibleOCRStudio.csproj')
 $Version = $Project.Project.PropertyGroup.Version
-$Output = Join-Path $Root "artifacts\ClearRead-Source-$Version.zip"
+$Output = Join-Path $Root "artifacts\TextBridge-Source-$Version.zip"
 New-Item -ItemType Directory -Force (Split-Path $Output) | Out-Null
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem

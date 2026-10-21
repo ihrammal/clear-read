@@ -6,9 +6,9 @@ $AllowedRoot = [IO.Path]::GetFullPath((Join-Path $Root '.tools')) + [IO.Path]::D
 if (-not $TestRoot.StartsWith($AllowedRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Installer test target is outside the project tools directory.' }
 if (Test-Path $TestRoot) { throw 'Installer test directory already exists. Inspect the previous test before retrying.' }
 $Suffix = if ($ProductionPackage) { '' } else { '-QA' }
-$Installer = Join-Path $Root "artifacts\ClearRead-Setup-1.0.0$Suffix.exe"
+$Installer = Join-Path $Root "artifacts\TextBridge-Setup-1.0.1$Suffix.exe"
 if (-not (Test-Path $Installer)) { throw 'Build the isolated QA installer first with build-installer.ps1 -TestInstall.' }
- $AppIdentity = if ($ProductionPackage) { '{9A9C570A-BA44-49B6-95E4-73B724DD0A60}_is1' } else { 'ClearRead-Isolated-QA_is1' }
+ $AppIdentity = if ($ProductionPackage) { '{9A9C570A-BA44-49B6-95E4-73B724DD0A60}_is1' } else { 'TextBridge-Isolated-QA_is1' }
 $UserRegistryPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity"
 if ($MachineWide) {
     if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') { throw 'Machine-wide installer verification is restricted to the disposable GitHub Windows runner.' }
@@ -30,7 +30,7 @@ function Install-App($Log) {
 }
 try {
     Install-App (Join-Path $Root ("artifacts\${LogPrefix}install-test.log"))
-    foreach ($file in @('ClearRead.exe', 'ocr\tesseract.exe', 'pdf\pdftoppm.exe', 'pdf\pdftotext.exe', 'pdf\pdfunite.exe', 'image\magick.exe', 'help\index.html')) {
+    foreach ($file in @('TextBridge.exe', 'ocr\tesseract.exe', 'pdf\pdftoppm.exe', 'pdf\pdftotext.exe', 'pdf\pdfunite.exe', 'image\magick.exe', 'help\index.html')) {
         if (-not (Test-Path (Join-Path $TestRoot $file))) { throw "Installed package is missing $file" }
     }
     if (-not (Test-Path $RegistryPath)) { throw 'Installer registration is missing for the requested scope.' }
@@ -39,6 +39,7 @@ try {
     Write-Output 'PASS: Reinstall into the same test directory succeeds.'
     $PublishRoot = [IO.Path]::GetFullPath((Join-Path $Root 'publish'))
     foreach ($file in Get-ChildItem $PublishRoot -Recurse -File) {
+        if ($file.Name -like 'ClearRead.*' -or $file.Name -eq 'ClearRead-LICENSE.txt') { continue }
         $relative = $file.FullName.Substring($PublishRoot.Length + 1)
         $installed = Join-Path $TestRoot $relative
         if (-not (Test-Path $installed) -or (Get-FileHash $file.FullName).Hash -ne (Get-FileHash $installed).Hash) { throw "Installed file does not match the published build: $relative" }
@@ -46,7 +47,7 @@ try {
     Write-Output 'PASS: Every installed application file matches the published file hash.'
     if (-not $SkipLaunch) {
     $info = New-Object System.Diagnostics.ProcessStartInfo
-    $info.FileName = Join-Path $TestRoot 'ClearRead.exe'
+    $info.FileName = Join-Path $TestRoot 'TextBridge.exe'
     $info.WorkingDirectory = $TestRoot
     $info.UseShellExecute = $false
     $info.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
@@ -77,4 +78,5 @@ finally {
         Write-Output "PASS: Uninstall removes the test binaries, directory and $ScopeName registration."
     }
 }
+
 

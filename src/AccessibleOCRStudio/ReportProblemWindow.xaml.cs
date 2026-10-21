@@ -43,7 +43,7 @@ public partial class ReportProblemWindow : Window
     {
         if (!HasRequiredFields) { ReportStatus.Text = "Enter a summary and actual behavior first."; Summary.Focus(); return false; }
         var picker = new SaveFileDialog { Title = "Save problem report", Filter = "Text report|*.txt", DefaultExt = ".txt",
-            FileName = $"ClearRead-problem-{_createdAt:yyyyMMdd-HHmmss}.txt", OverwritePrompt = true };
+            FileName = $"TextBridge-problem-{_createdAt:yyyyMMdd-HHmmss}.txt", OverwritePrompt = true };
         if (picker.ShowDialog(this) != true) { ReportStatus.Text = "Save cancelled. Your report is still open."; return false; }
         try
         {
@@ -73,7 +73,7 @@ public partial class ReportProblemWindow : Window
         {
             if (!SaveToFile()) return;
             draft = ProblemReportService.CreateEmailDraft(Summary.Text,
-                "Please attach the saved Clear Read text report before sending. The full details are in that file.");
+                "Please attach the saved TextBridge text report before sending. The full details are in that file.");
         }
         try
         {
@@ -88,12 +88,12 @@ public partial class ReportProblemWindow : Window
         var draft = ProblemReportService.CreateGitHubDraft(_settings.GitHubRepositoryUrl, Summary.Text, BuildReport());
         if (draft is null) { ReportStatus.Text = "GitHub reporting is not available yet. Email, save or copy the report instead."; return; }
         if (MessageBox.Show(this, "GitHub issues may be public. The report preview will be included in an issue draft. Open the draft for review? Nothing will be submitted automatically.",
-            "Clear Read — GitHub report", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
+            "TextBridge — GitHub report", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
         if (draft.AbsoluteUri.Length > 6000)
         {
             if (!SaveToFile()) return;
             draft = ProblemReportService.CreateGitHubDraft(_settings.GitHubRepositoryUrl, Summary.Text,
-                "Please attach the saved Clear Read text report after reviewing it for private information. The full details are in that file.")!;
+                "Please attach the saved TextBridge text report after reviewing it for private information. The full details are in that file.")!;
         }
         try
         {
@@ -112,7 +112,7 @@ public partial class ReportProblemWindow : Window
         try
         {
             var answer = MessageBox.Show(this, "Save this problem report before closing? Choose No to discard it or Cancel to continue editing.",
-                "Clear Read — Unsaved problem report", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+                "TextBridge — Unsaved problem report", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
             if (answer == MessageBoxResult.No || (answer == MessageBoxResult.Yes && SaveToFile())) e.Cancel = false;
         }
         finally { _confirmingClose = false; }

@@ -1,4 +1,4 @@
-# Dialog and shortcut audit for Clear Read.
+# Dialog and shortcut audit for TextBridge.
 # Launches its own published app instance and verifies that modal dialogs
 # cannot stack on top of each other, that Escape and Enter close every
 # dialog, that focus returns to the document, that the main window is
@@ -10,7 +10,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
-if (-not $ExePath) { $ExePath = Join-Path $Root 'publish\ClearRead.exe' }
+if (-not $ExePath) { $ExePath = Join-Path $Root 'publish\TextBridge.exe' }
 if (-not $ImagePath) { $ImagePath = Join-Path $Root 'artifacts\accessibility-tests\english.png' }
 if (-not (Test-Path $ExePath)) { throw "App not found at $ExePath. Run scripts\build-windows.ps1 first." }
 
@@ -184,18 +184,18 @@ function Press-Button($procId, $box, [string]$name) {
 }
 
 # ---------------------------------------------------------------- settings backup
-$settingsPath = Join-Path $env:APPDATA 'Clear Read\settings.json'
+$settingsPath = Join-Path $env:APPDATA 'TextBridge\settings.json'
 $settingsBackup = $null
 if (Test-Path $settingsPath) { $settingsBackup = Get-Content $settingsPath -Raw }
 
 try {
-    foreach ($p in (Get-Process -Name ClearRead -ErrorAction SilentlyContinue)) { $p.Kill(); $p.WaitForExit() }
+    foreach ($p in (Get-Process -Name TextBridge -ErrorAction SilentlyContinue)) { $p.Kill(); $p.WaitForExit() }
     $proc = Start-Process -FilePath $ExePath -WorkingDirectory (Split-Path $ExePath) -PassThru
     $procId = $proc.Id
     Start-Sleep -Seconds 5
 
-    $main = Wait-Window $procId 'Clear Read' 25000
-    if ($main -and $main.Current.Name -eq 'Clear Read') { Pass 'Published app starts with window title Clear Read' }
+    $main = Wait-Window $procId 'TextBridge' 25000
+    if ($main -and $main.Current.Name -eq 'TextBridge') { Pass 'Published app starts with window title TextBridge' }
     else { Fail 'Main window was not found'; exit 1 }
     $script:mainWindow = $main
     $script:mainRuntimeId = ($main.GetRuntimeId() | ForEach-Object { "$_" }) -join ','
@@ -209,16 +209,16 @@ try {
     # Invoke on the menu item while the first dialog is still open.
     Activate $procId
     Key '^r'; Start-Sleep -Milliseconds 1200
-    $box = Wait-WindowExcept $procId 'Clear Read' 6000
+    $box = Wait-WindowExcept $procId 'TextBridge' 6000
     if (-not $box) { Fail 'Ctrl+R with no document open did not show its prompt (flood test setup failed)' }
     else {
         Press-Button $procId $box 'OK' | Out-Null
         Start-Sleep -Milliseconds 800
-        $stillOpen = Wait-WindowExcept $procId 'Clear Read' 2000
+        $stillOpen = Wait-WindowExcept $procId 'TextBridge' 2000
         if (-not $stillOpen) { Pass 'The no-document prompt was visible and its OK button closes it' }
         else { Key '{ESC}'; Start-Sleep -Milliseconds 600; Fail 'The no-document prompt OK button did not close it' }
         Key '^r'; Start-Sleep -Milliseconds 1200
-        $box = Wait-WindowExcept $procId 'Clear Read' 6000
+        $box = Wait-WindowExcept $procId 'TextBridge' 6000
         if (-not $box) { Fail 'Ctrl+R did not re-show the no-document prompt for the flood test' }
         else {
             $ocr = Find-ByName $main 'OCR'
@@ -231,14 +231,14 @@ try {
                 for ($i = 0; $i -lt 5; $i++) { $inv.Invoke(); Start-Sleep -Milliseconds 300 }
             } else { Fail 'Recognize Document menu item was not invokable during the flood test' }
             Start-Sleep -Milliseconds 1200
-            $count = Count-ProcWindows $procId 'Clear Read' -ExcludeMain
+            $count = Count-ProcWindows $procId 'TextBridge' -ExcludeMain
             if ($count -eq 1) { Pass 'Repeated automation requests while a dialog is open show exactly one message box' }
             else { Fail "Reentrant requests produced $count message boxes (expected exactly one)" }
             Press-Button $procId $box 'OK' | Out-Null
             Start-Sleep -Milliseconds 800
         }
     }
-    $remaining = Count-ProcWindows $procId 'Clear Read' -ExcludeMain
+    $remaining = Count-ProcWindows $procId 'TextBridge' -ExcludeMain
     if ($remaining -eq 0) { Pass 'Only the main window remains after the flood dialog is dismissed' }
     else { Fail "Dialogs remained open after dismissal (count $remaining)" }
     if ((Get-Focused) -like '*DocumentText*') { Pass 'Focus returns to the document after the flood dialog' }
@@ -251,13 +251,13 @@ try {
         $exp = $null
         if ($help.TryGetCurrentPattern([System.Windows.Automation.ExpandCollapsePattern]::Pattern, [ref]$exp)) { $exp.Expand() }
         Start-Sleep -Milliseconds 400
-        $item = Find-ByName $help 'About Clear Read'
+        $item = Find-ByName $help 'About TextBridge'
         if (-not $item) { return $null }
         $p = $null
         if (-not $item.TryGetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern, [ref]$p)) { return $null }
         $p.Invoke()
         Start-Sleep -Milliseconds 800
-        return (Wait-Window $procId 'About Clear Read' 6000)
+        return (Wait-Window $procId 'About TextBridge' 6000)
     }
     $about = Show-About
     if ($about) {
@@ -266,11 +266,11 @@ try {
         try { [Fg]::Force([IntPtr]$about.Current.NativeWindowHandle) | Out-Null } catch { }
         Start-Sleep -Milliseconds 300
         Key '{ESC}'; Start-Sleep -Milliseconds 900
-        if (Wait-Gone $procId 'About Clear Read' 6000) { Pass 'Escape closes the About box' } else { Fail 'Escape did not close the About box' }
+        if (Wait-Gone $procId 'About TextBridge' 6000) { Pass 'Escape closes the About box' } else { Fail 'Escape did not close the About box' }
         $about2 = Show-About
         if ($about2) {
             $ok = Press-Button $procId $about2 'OK'
-            if ($ok -and (Wait-Gone $procId 'About Clear Read' 6000)) { Pass 'Enter closes the About box through its default button' }
+            if ($ok -and (Wait-Gone $procId 'About TextBridge' 6000)) { Pass 'Enter closes the About box through its default button' }
             else { Fail 'Enter did not close the About box'; Key '{ESC}' }
         } else { Fail 'About box did not reopen for the Enter test' }
     } else { Fail 'Help > About did not open its message box' }
@@ -340,7 +340,7 @@ try {
     else { Fail "Focus after shortcut matrix was '$(Get-Focused)'" }
 
     # ---------------------------------------------------------------- shortcuts after a modal dialog closes
-    $main = Wait-Window $procId 'Clear Read' 3000
+    $main = Wait-Window $procId 'TextBridge' 3000
     Activate $procId
     $dlg = Open-Preferences
     if ($dlg) { $dlg.SetFocus(); Key '{ESC}'; Start-Sleep -Milliseconds 800 }
@@ -361,7 +361,7 @@ try {
         [System.Windows.Forms.SendKeys]::SendWait($ImagePath); Start-Sleep -Milliseconds 400
         Key '{ENTER}'; Start-Sleep -Milliseconds 2500
         Wait-Gone $procId 'Open' 8000 | Out-Null
-        $main = Wait-Window $procId 'Clear Read' 5000
+        $main = Wait-Window $procId 'TextBridge' 5000
         Key '^r'; Start-Sleep -Milliseconds 800
         $done = $false
         $sw = [Diagnostics.Stopwatch]::StartNew()
@@ -373,7 +373,7 @@ try {
         $st = Find-ById $main 'StatusText'
         if ($st -and $st.Current.Name -eq 'Recognition complete.') { Pass 'Recognition completes with a fixture image' }
         else { Fail "Recognition ended with '$($st.Current.Name)'"; }
-        $dialogCount = (Count-ProcWindows $procId 'Clear Read' -ExcludeMain) + (Count-ProcWindows $procId 'OCR Error')
+        $dialogCount = (Count-ProcWindows $procId 'TextBridge' -ExcludeMain) + (Count-ProcWindows $procId 'OCR Error')
         if ($dialogCount -eq 0) { Pass 'Routine completion opens no modal dialog' }
         else { Fail "Completion left $dialogCount dialogs open" }
         Key '{F4}'; Start-Sleep -Milliseconds 700
@@ -395,7 +395,7 @@ try {
 finally {
     if ($null -ne $settingsBackup) { Set-Content $settingsPath -Value $settingsBackup -Encoding UTF8 }
     elseif (Test-Path $settingsPath) { Remove-Item $settingsPath -Force }
-    foreach ($p in (Get-Process -Name ClearRead -ErrorAction SilentlyContinue)) { $p.Kill() }
+    foreach ($p in (Get-Process -Name TextBridge -ErrorAction SilentlyContinue)) { $p.Kill() }
 }
 
 Write-Output ''

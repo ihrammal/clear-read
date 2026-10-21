@@ -31,7 +31,7 @@ public sealed class ApiCorrectionService
     {
         if(ConfigurationError(settings,key,false) is {} error) throw new InvalidOperationException(error);
         if(settings.ApiProvider=="OpenAI") { await _openAi.TestConnectionAsync(settings,key,cancellation); return; }
-        await RequestAsync("Clear Read API connection test.",settings,key,true,cancellation);
+        await RequestAsync("TextBridge API connection test.",settings,key,true,cancellation);
     }
     public async Task<string> CorrectAsync(string text,AppSettings settings,string key,bool confirmed,CancellationToken cancellation=default)
     {

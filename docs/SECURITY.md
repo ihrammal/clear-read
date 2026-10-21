@@ -1,4 +1,4 @@
-# Clear Read security and privacy design
+# TextBridge security and privacy design
 
 AOS performs core OCR locally. Document content is not sent to an online service by the local OCR pipeline.
 
