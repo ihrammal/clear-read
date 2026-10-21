@@ -45,7 +45,7 @@ internal static class ProviderChecks
             using(var probe=JsonDocument.Parse(handler.BodySent!))
             {
                 var sample=provider=="Gemini"?probe.RootElement.GetProperty("contents")[0].GetProperty("parts")[0].GetProperty("text").GetString():probe.RootElement.GetProperty("messages")[1].GetProperty("content").GetString();
-                check(sample=="Clear Read API connection test.",provider+" Test API key makes an actual generation request using only a fixed sample");
+                check(sample=="TextBridge API connection test.",provider+" Test API key makes an actual generation request using only a fixed sample");
             }
             var count=handler.Calls;
             settings.AllowApiDocumentContent=false;

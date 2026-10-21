@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text;
@@ -11,12 +11,12 @@ public sealed class ExportService
 
     public Task SaveTextAsync(string path, string text) => File.WriteAllTextAsync(path, text, new UTF8Encoding(true));
 
-    public async Task SaveHtmlAsync(string path, string text, string title = "Recognized document")
+    public async Task SaveHtmlAsync(string path, string text, string title = "Recognized document", bool preserveLayout = false)
     {
         var encTitle = System.Net.WebUtility.HtmlEncode(title);
         var body = new StringBuilder();
         var inList = false;
-        var blocks = _structure.Analyze(text);
+        var blocks = _structure.Analyze(text, preserveWhitespace: preserveLayout);
         foreach (var block in blocks)
         {
             var content = System.Net.WebUtility.HtmlEncode(block.Text);
@@ -41,17 +41,17 @@ public sealed class ExportService
             ? "en"
             : blocks.GroupBy(b => LanguageTag(b.Text, b.RightToLeft))
                 .OrderByDescending(g => g.Count()).ThenBy(g => g.Key).First().Key;
-        var html = $"<!doctype html><html lang=\"{documentLang}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{encTitle}</title></head><body><main><h1>{encTitle}</h1>{body}</main></body></html>";
+        var html = $"<!doctype html><html lang=\"{documentLang}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{encTitle}</title><style>p,h2,li{{white-space:pre-wrap;tab-size:4}}</style></head><body><main><h1>{encTitle}</h1>{body}</main></body></html>";
         await File.WriteAllTextAsync(path, html, new UTF8Encoding(false));
     }
 
-    public Task SaveMarkdownAsync(string path, string text, string title = "Recognized document")
+    public Task SaveMarkdownAsync(string path, string text, string title = "Recognized document", bool preserveLayout = false)
     {
         var safeTitle = title.Replace("#", string.Empty).Trim();
         return File.WriteAllTextAsync(path, $"# {safeTitle}\n\n{text}", new UTF8Encoding(false));
     }
 
-    public void SaveAccessibleDocx(string path, string text, string title = "Recognized document")
+    public void SaveAccessibleDocx(string path, string text, string title = "Recognized document", bool preserveLayout = false)
     {
         using var doc = WordprocessingDocument.Create(path, WordprocessingDocumentType.Document);
         var main = doc.AddMainDocumentPart();
@@ -60,7 +60,7 @@ public sealed class ExportService
         var body = main.Document.AppendChild(new Body());
         AddParagraph(body, title, "Title", ContainsArabic(title));
 
-        foreach (var block in _structure.Analyze(text))
+        foreach (var block in _structure.Analyze(text, preserveWhitespace: preserveLayout))
         {
             var style = block.Kind == "Heading" ? "Heading1" : null;
             AddParagraph(body, block.Text, style, block.RightToLeft);
@@ -116,3 +116,4 @@ public sealed class ExportService
 
     private static string LanguageTag(string s, bool rightToLeft) => rightToLeft || ContainsArabic(s) ? "ar" : ContainsFrench(s) ? "fr" : "en";
 }
+

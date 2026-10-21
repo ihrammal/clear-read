@@ -12,7 +12,7 @@ public static class ProblemReportService
         bool includeDiagnostics, AppSettings settings, DateTimeOffset createdAt)
     {
         var report = new StringBuilder();
-        report.AppendLine("Clear Read problem report");
+        report.AppendLine("TextBridge problem report");
         report.AppendLine($"Application version: {Version}");
         report.AppendLine($"Created (UTC): {createdAt.ToUniversalTime():O}");
         report.AppendLine();
@@ -55,7 +55,7 @@ public static class ProblemReportService
         var title = summary.Replace("\r", " ").Replace("\n", " ").Trim();
         if (title.Length > 80) title = title[..80];
         if (title.Length > 0 && char.IsHighSurrogate(title[^1])) title = title[..^1];
-        var subject = $"Clear Read {Version} problem: {title}";
+        var subject = $"TextBridge {Version} problem: {title}";
         return new Uri($"mailto:{SupportEmail}?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(report)}");
     }
 }

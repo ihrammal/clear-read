@@ -21,7 +21,7 @@ public partial class ApiSettingsWindow : Window
         OcrCorrection.IsChecked = settings.AllowApiOcrCorrection;
         ModelId.Text = ApiProviderCatalog.Model(settings, settings.ApiProvider);
         foreach (ComboBoxItem item in Provider.Items)
-            if ((item.Content?.ToString() ?? "").Equals(settings.ApiProvider, StringComparison.OrdinalIgnoreCase)) { Provider.SelectedItem = item; break; }
+            if ((item.Tag?.ToString() ?? item.Content?.ToString() ?? "").Equals(settings.ApiProvider, StringComparison.OrdinalIgnoreCase)) { Provider.SelectedItem = item; break; }
         if (Provider.SelectedIndex < 0) Provider.SelectedIndex = 0;
         LoadProviderCredential();
         Provider.SelectionChanged += (_, _) => LoadProviderCredential();
@@ -29,7 +29,7 @@ public partial class ApiSettingsWindow : Window
         ModelId.TextChanged += (_, _) => { if (!_loadingProvider) ApiStatus.Text = "Model changed. Use Test API key to check the current key and model."; };
         Closed += (_, _) => { _lifetime.Cancel(); _lifetime.Dispose(); ApiKey.Clear(); };
     }
-    private string SelectedProvider => (Provider.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "None";
+    private string SelectedProvider => ((Provider.SelectedItem as ComboBoxItem)?.Tag ?? (Provider.SelectedItem as ComboBoxItem)?.Content)?.ToString() ?? "None";
     private void LoadProviderCredential()
     {
         _loadingProvider = true;
@@ -37,14 +37,14 @@ public partial class ApiSettingsWindow : Window
         ApiKey.Password = SelectedProvider == "None" ? string.Empty : _credentials.Load(SelectedProvider) ?? string.Empty;
         ModelId.Text = ApiProviderCatalog.Model(_settings, SelectedProvider);
         ProviderNotice.Text = ApiProviderCatalog.Notice(SelectedProvider);
-        ApiKeyLabel.Text = "Your " + SelectedProvider + " API key";
+        ApiKeyLabel.Text = UiLanguage.T("Your " + SelectedProvider + " API key");
         CreateApiKey.IsEnabled = ApiProviderCatalog.IsSupported(SelectedProvider);
-        CreateApiKey.Content = "_Create " + SelectedProvider + " API key (opens website)";
-        TestApiKey.Content = "_Test " + SelectedProvider + " API key";
+        CreateApiKey.Content = UiLanguage.T("_Create " + SelectedProvider + " API key (opens website)");
+        TestApiKey.Content = UiLanguage.T("_Test " + SelectedProvider + " API key");
         TestApiKey.IsEnabled = ApiProviderCatalog.IsSupported(SelectedProvider);
         ApiStatus.Text = "Testing uses only a fixed short sample, never your document. Free quota or paid charges depend on your account plan.";
         } finally { _loadingProvider = false; }
-        System.Windows.Automation.AutomationProperties.SetName(Provider, $"API provider: {SelectedProvider}");
+        System.Windows.Automation.AutomationProperties.SetName(Provider, UiLanguage.T($"API provider: {SelectedProvider}"));
         ProviderSelectionStatus.Text = $"{SelectedProvider} selected.";
     }
     private AppSettings PendingSettings()
@@ -103,6 +103,7 @@ public partial class ApiSettingsWindow : Window
         catch { ApiStatus.Text = "Could not save API settings or the protected key. Check that your Windows profile is writable, then try again. Local OCR remains available."; ApiStatus.Focus(); }
     }
 }
+
 
 
 

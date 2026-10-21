@@ -36,7 +36,7 @@ internal static class ToastAnnouncements
         if (now - _lastTick < 800) return;
         _lastTick = now;
         _lastText = message;
-        try { new ToastContentBuilder().AddText("Clear Read").AddText(message).Show(); } catch { }
+        try { new ToastContentBuilder().AddText("TextBridge").AddText(message).Show(); } catch { }
     }
 
     internal static bool IsMilestone(string t) =>

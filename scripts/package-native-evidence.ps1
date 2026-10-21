@@ -38,7 +38,7 @@ $Evidence = [ordered]@{ generatedAtUtc=[DateTimeOffset]::UtcNow.ToString('o'); s
 $ReportPath = Join-Path $Root "artifacts/poppler-evidence-$Version.json"
 $Evidence | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$ArchivePath = Join-Path $Root "artifacts/ClearRead-Poppler-Review-$Version.zip"
+$ArchivePath = Join-Path $Root "artifacts/TextBridge-Poppler-Review-$Version.zip"
 $Stream = [IO.File]::Open($ArchivePath, [IO.FileMode]::Create)
 $Zip = [IO.Compression.ZipArchive]::new($Stream, [IO.Compression.ZipArchiveMode]::Create)
 try {

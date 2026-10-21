@@ -221,6 +221,8 @@ public sealed class LocalOcrService
     {
         psi.ArgumentList.Add("--psm");
         psi.ArgumentList.Add(settings.AutoRotate ? "1" : settings.OcrMode == "fast" ? "6" : "3");
+        if (settings.PreserveTextLayout)
+        { psi.ArgumentList.Add("-c"); psi.ArgumentList.Add("preserve_interword_spaces=1"); }
         // Connected Arabic letter shapes can be misclassified as an entire noise row.
         if (settings.OcrLanguages.Split('+').Contains("ara", StringComparer.OrdinalIgnoreCase))
         {
@@ -247,3 +249,4 @@ public sealed class LocalOcrService
         return int.TryParse(tail, out var n) ? n : int.MaxValue;
     }
 }
+

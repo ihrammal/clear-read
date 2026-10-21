@@ -1,6 +1,6 @@
 from pathlib import Path,PurePosixPath
-import json,urllib.request,hashlib,tarfile,io
-r=Path('D:/AOS');cache=r/'.tools/redistribution-review/debian-packages';cache.mkdir(exist_ok=True);records=[]
+import json,urllib.request,hashlib,tarfile,io,xml.etree.ElementTree as ET
+r=Path(__file__).resolve().parents[1];version=ET.parse(r/'src/AccessibleOCRStudio/AccessibleOCRStudio.csproj').findtext('.//Version');cache=r/'.tools/redistribution-review/debian-packages';cache.mkdir(parents=True,exist_ok=True);records=[]
 for flavor in ['posix','win32']:
  name='gcc-mingw-w64-x86-64-'+flavor+'-runtime_14.2.0-19+27+b1_amd64.deb';url='https://deb.debian.org/debian/pool/main/g/gcc-mingw-w64/'+name;p=cache/name
  if not p.exists():
@@ -23,4 +23,4 @@ for flavor in ['posix','win32']:
      if m.isfile() and m.name.endswith('/copyright'):
       out=dest/(PurePosixPath(m.name).parent.name+'-copyright.txt');out.write_bytes(t.extractfile(m).read())
  print(name+': '+str(rec['matchedFiles']));records.append(rec)
-(r/'artifacts/tesseract-compiler-review-1.0.0.json').write_text(json.dumps(records,indent=2)+'\n')
+(r/f'artifacts/tesseract-compiler-review-{version}.json').write_text(json.dumps(records,indent=2)+'\n')

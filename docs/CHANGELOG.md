@@ -1,3 +1,18 @@
+# 1.0.2 — manual accessibility review fixes
+
+- Add a persistent View > Show status bar toggle, hidden by default, with on-demand status access and progress announcements.
+- Make Escape close one submenu level; Alt/F10 returns to the document.
+- Keep Cut and Copy reachable and give selection guidance without changing unselected text.
+- Add low-vision font, point size, bold, interface size and five colour choices; respect Windows high contrast.
+- Read the About/update version from the assembly so it matches the installer.
+
+# 1.0.1 — TextBridge, 21 October 2026
+
+- Rename the app, bilingual interface, announcements, reports, help, executable and installer to TextBridge.
+- Preserve settings and protected keys from Clear Read and Accessible OCR Studio without overwriting newer values.
+- Retain the installer upgrade identity and existing GitHub repository/feed; new release assets use TextBridge-Setup-VERSION.exe.
+- Historical release notes retain the names used at the time.
+
 # 1.0.0 — prepared, unpublished
 
 - Set application, About box and installer to the requested 1.0.0 version.

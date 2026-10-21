@@ -9,7 +9,7 @@ if (-not (Test-Path $Compiler)) {
     if (-not $Command) { throw 'Inno Setup compiler is missing. Install Inno Setup 6 or prepare the portable compiler in .tools\inno.' }
     $Compiler = $Command.Source
 }
- if (-not (Test-Path (Join-Path $Root 'publish\ClearRead.exe'))) { throw 'Build the app with build-windows.ps1 first.' }
+ if (-not (Test-Path (Join-Path $Root 'publish\TextBridge.exe'))) { throw 'Build the app with build-windows.ps1 first.' }
 $Arguments = @('/Qp')
 if ($TestInstall) { $Arguments += '/DTestInstall' }
 $Arguments += Join-Path $Root 'installer\AccessibleOCRStudio.iss'

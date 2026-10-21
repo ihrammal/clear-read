@@ -1,4 +1,4 @@
-# Contributing to Clear Read
+# Contributing to TextBridge
 
 Use synthetic files when reporting OCR or accessibility problems. Include the app version, Windows version, recognition language and relevant screen-reader version. Never include private document contents or credentials in a public issue.
 

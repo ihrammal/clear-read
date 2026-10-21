@@ -1,6 +1,6 @@
 # Privacy model
 
-Clear Read is local-first. Offline Only Mode is enabled by default. OCR of PDFs and images must not require an Internet connection when the bundled runtime is installed.
+TextBridge is local-first. Offline Only Mode is enabled by default. OCR of PDFs and images must not require an Internet connection when the bundled runtime is installed.
 
 API processing is optional. Document content may be transmitted only when Offline Only Mode is disabled AND the user explicitly allows API document content. API credentials are stored separately from settings and protected for the current Windows user with Windows Data Protection API (DPAPI).
 

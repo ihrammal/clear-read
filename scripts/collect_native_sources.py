@@ -47,7 +47,7 @@ for package in review['packages']:
                 for original in urls:
                     url = original.replace('http://', 'https://', 1)
                     try:
-                        request = urllib.request.Request(url, headers={'User-Agent':'ClearRead-release-review'})
+                        request = urllib.request.Request(url, headers={'User-Agent':'TextBridge-release-review'})
                         with urllib.request.urlopen(request, timeout=25) as response, target.open('wb') as output:
                             shutil.copyfileobj(response, output)
                         if hashlib.sha256(target.read_bytes()).hexdigest()!=expected:
@@ -69,10 +69,10 @@ report=dict(scope='Matched open-source PDF dependency source archives; Microsoft
             remaining=['Review matching build/patch instructions in the Poppler review evidence archive.', 'Collect any failed archives.', 'Complete separate Tesseract/ImageMagick native source and notice matching.'])
 report_path=ROOT/'artifacts/native-source-evidence-1.0.0.json'
 report_path.write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')
-with zipfile.ZipFile(ROOT/'artifacts/ClearRead-Native-Source-Evidence-1.0.0.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+with zipfile.ZipFile(ROOT/'artifacts/TextBridge-Native-Source-Evidence-1.0.0.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
     archive.write(report_path, report_path.name)
     for record in records:
         if record['status']=='hash-matched':
             archive.write(OUT/record['file'], 'sources/'+record['file'])
-    archive.write(ROOT/'artifacts/ClearRead-Poppler-Review-1.0.0.zip', 'recipes-notices-and-package-metadata.zip')
+    archive.write(ROOT/'artifacts/TextBridge-Poppler-Review-1.0.0.zip', 'recipes-notices-and-package-metadata.zip')
 print('Source evidence packaged; complete corresponding-source approval remains open.', flush=True)

@@ -5,3 +5,5 @@ publish/
 TestResults/
 runtime/
 artifacts/
+__pycache__/
+*.py[cod]

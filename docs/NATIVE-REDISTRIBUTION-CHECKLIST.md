@@ -1,7 +1,11 @@
 # Native runtime redistribution review — Clear Read
 
+For the refreshed TextBridge 1.0.2 binary/source matches and collected source
+assets, see [DEPENDENCY-EVIDENCE-1.0.2.md](DEPENDENCY-EVIDENCE-1.0.2.md).
+The earlier unmatched-library counts below are historical.
+
 This is an inventory of unfinished release work, not a completed legal audit.
-Clear Read source is MIT. Bundled components retain their own licenses.
+The revised Clear Read code is free for noncommercial use under LICENSE. Earlier MIT-licensed copies retain that license. Bundled components retain their own licenses.
 
 | Component | Observed version | Local notices | Work before public binary distribution |
 | --- | --- | --- | --- |

@@ -8,17 +8,23 @@ public sealed class CredentialService
     private readonly string Folder;
     public CredentialService(string? folder = null)
     {
-        Folder = folder ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Clear Read", "credentials");
-        if (folder is not null) return;
+        Folder = folder ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TextBridge", "credentials");
+        // Migrate once: keys deliberately deleted in TextBridge must stay deleted.
+        if (folder is not null || Directory.Exists(Folder)) return;
+        MigrateFromLegacy(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Clear Read", "credentials"), Folder);
         var legacyFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Accessible OCR Studio", "credentials");
         MigrateFromLegacy(legacyFolder, Folder);
     }
 
     public static void MigrateFromLegacy(string legacyFolder, string newFolder)
     {
-        if (Directory.Exists(newFolder) || !Directory.Exists(legacyFolder)) return;
+        if (!Directory.Exists(legacyFolder)) return;
         Directory.CreateDirectory(newFolder);
-        foreach (var file in Directory.GetFiles(legacyFolder)) File.Copy(file, Path.Combine(newFolder, Path.GetFileName(file)));
+        foreach (var file in Directory.GetFiles(legacyFolder))
+        {
+            var destination = Path.Combine(newFolder, Path.GetFileName(file));
+            if (!File.Exists(destination)) File.Copy(file, destination);
+        }
     }
     public void Save(string provider, string apiKey)
     {

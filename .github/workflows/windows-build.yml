@@ -7,6 +7,9 @@ on:
     branches: [ main, 'codex/release-*' ]
 permissions:
   contents: read
+concurrency:
+  group: windows-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: windows-latest
@@ -23,7 +26,7 @@ jobs:
         shell: pwsh
         run: |
           [xml]$csproj = Get-Content ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj
-          Write-Host "Building Clear Read $($csproj.Project.PropertyGroup.Version)"
+          Write-Host "Building TextBridge $($csproj.Project.PropertyGroup.Version)"
       - name: Restore and build
         shell: pwsh
         run: dotnet build ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj -c Release
@@ -46,16 +49,16 @@ jobs:
           ./scripts/test-installer.ps1 -ProductionPackage -MachineWide -SkipLaunch *>&1 | Tee-Object artifacts/admin-installer-verification-ci.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: ClearRead-win-x64
+          name: TextBridge-win-x64
           path: |
             publish/
-            artifacts/ClearRead-Setup-*.exe
+            artifacts/TextBridge-Setup-*.exe
           if-no-files-found: error
       - name: Preserve verification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ClearRead-verification
+          name: TextBridge-verification
           path: |
             artifacts/*verification-ci.txt
             artifacts/*test.log

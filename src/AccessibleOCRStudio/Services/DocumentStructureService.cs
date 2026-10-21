@@ -6,15 +6,15 @@ public sealed class DocumentStructureService
 {
     private static readonly Regex Bullet = new(@"^\s*([-*•]|\d+[.)])\s+", RegexOptions.Compiled);
 
-    public List<DocumentBlock> Analyze(string text, int page = 1)
+    public List<DocumentBlock> Analyze(string text, int page = 1, bool preserveWhitespace = false)
     {
         var blocks = new List<DocumentBlock>();
         foreach (var raw in text.Replace("\r\n", "\n").Split('\n'))
         {
             var line = raw.Trim();
-            if (line.Length == 0) continue;
+            if (line.Length == 0 && !preserveWhitespace) continue;
             var kind = Bullet.IsMatch(line) ? "ListItem" : IsHeading(line) ? "Heading" : "Paragraph";
-            blocks.Add(new DocumentBlock(kind, line, page, ContainsArabic(line)));
+            blocks.Add(new DocumentBlock(kind, preserveWhitespace ? raw : line, page, ContainsArabic(line)));
         }
         return blocks;
     }
@@ -29,3 +29,4 @@ public sealed class DocumentStructureService
     }
     private static bool ContainsArabic(string s) => s.Any(c => c is >= '\u0600' and <= '\u06FF' or >= '\u0750' and <= '\u077F' or >= '\u08A0' and <= '\u08FF');
 }
+

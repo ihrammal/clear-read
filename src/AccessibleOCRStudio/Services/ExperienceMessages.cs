@@ -12,9 +12,9 @@ public static class ExperienceMessages
     };
     public static string Get(string key, string? language) => (key, Language(language)) switch
     {
-        ("welcome", "ar") => "مرحباً بك في Clear Read من إيمان رمال",
-        ("welcome", "fr") => "Bienvenue dans Clear Read, par Iman Rammal",
-        ("welcome", _) => "Welcome to Clear Read by Iman Rammal",
+        ("welcome", "ar") => "مرحباً بك في TextBridge من إيمان رمال",
+        ("welcome", "fr") => "Bienvenue dans TextBridge, par Iman Rammal",
+        ("welcome", _) => "Welcome to TextBridge by Iman Rammal",
         ("goodbye", "ar") => "شكراً لاستخدامك البرنامج. إلى اللقاء.",
         ("goodbye", "fr") => "Merci d’avoir utilisé mon programme. Au revoir.",
         ("goodbye", _) => "Thank you for using my program. Goodbye.",
