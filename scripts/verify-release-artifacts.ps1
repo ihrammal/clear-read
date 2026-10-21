@@ -36,7 +36,7 @@ function Test-Archive($Path, $Base, $Expected) {
 $SourceFiles = @{}
 foreach ($Directory in @('src','tests','scripts','help','resources','installer','docs','.github')) {
     Get-ChildItem -LiteralPath (Join-Path $Root $Directory) -Recurse -File -Force |
-        Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' -and $_.Extension -notin @('.user','.suo') } |
+        Where-Object { $_.FullName -notmatch '[\\/](bin|obj|__pycache__)[\\/]' -and $_.Extension -notin @('.user','.suo','.pyc','.pyo') } |
         ForEach-Object { $SourceFiles[[IO.Path]::GetRelativePath($Root, $_.FullName).Replace('\','/')] = $true }
 }
 foreach ($Name in @('README.md','LICENSE','.gitignore','.gitattributes','global.json')) { $SourceFiles[$Name] = $true }

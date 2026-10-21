@@ -9,7 +9,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $Files = @()
 foreach ($directory in @('src', 'tests', 'scripts', 'help', 'resources', 'installer', 'docs', '.github')) {
     $Files += Get-ChildItem -LiteralPath (Join-Path $Root $directory) -Recurse -File -Force |
-        Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' -and $_.Extension -notin @('.user', '.suo') }
+        Where-Object { $_.FullName -notmatch '[\\/](bin|obj|__pycache__)[\\/]' -and $_.Extension -notin @('.user', '.suo', '.pyc', '.pyo') }
 }
 foreach ($name in @('README.md', 'LICENSE', '.gitignore', '.gitattributes', 'global.json')) { $Files += Get-Item -Force (Join-Path $Root $name) }
 $Stream = [System.IO.File]::Open($Output, [System.IO.FileMode]::Create)
