@@ -4,7 +4,7 @@ namespace AccessibleOCRStudio.Services;
 
 public sealed class AppSettings
 {
-    public string GitHubRepositoryUrl { get; set; } = "https://github.com/ihrammal/clear-read";
+    public string GitHubRepositoryUrl { get; set; } = "https://github.com/ihrammal/textbridge";
     public string InterfaceLanguage { get; set; } = "auto";
     public string MessageLanguage { get; set; } = "auto";
     public bool PlayStartupSound { get; set; } = true;
@@ -38,7 +38,7 @@ public sealed class AppSettings
     public string GroqModel { get; set; } = "openai/gpt-oss-20b";
     public string OpenAiModel { get; set; } = OpenAiCorrectionService.DefaultModel;
     public string ApiProvider { get; set; } = "None";
-    public string UpdateFeedUrl { get; set; } = "https://api.github.com/repos/ihrammal/clear-read/releases/latest";
+    public string UpdateFeedUrl { get; set; } = "https://api.github.com/repos/ihrammal/textbridge/releases/latest";
 
     private static string AppDataRoot =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TextBridge");
@@ -71,6 +71,11 @@ public sealed class AppSettings
             var settings = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path)) ?? new();
             if (string.IsNullOrWhiteSpace(settings.UpdateFeedUrl)) settings.UpdateFeedUrl = new AppSettings().UpdateFeedUrl;
             if (string.IsNullOrWhiteSpace(settings.GitHubRepositoryUrl)) settings.GitHubRepositoryUrl = new AppSettings().GitHubRepositoryUrl;
+            // Use the canonical repository after its rename; preserve custom feeds.
+            if (string.Equals(settings.UpdateFeedUrl.TrimEnd('/'), "https://api.github.com/repos/ihrammal/clear-read/releases/latest", StringComparison.OrdinalIgnoreCase))
+                settings.UpdateFeedUrl = new AppSettings().UpdateFeedUrl;
+            if (string.Equals(settings.GitHubRepositoryUrl.TrimEnd('/'), "https://github.com/ihrammal/clear-read", StringComparison.OrdinalIgnoreCase))
+                settings.GitHubRepositoryUrl = new AppSettings().GitHubRepositoryUrl;
             return settings;
         }
         catch { return new(); }

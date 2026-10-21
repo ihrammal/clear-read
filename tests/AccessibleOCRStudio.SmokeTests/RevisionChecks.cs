@@ -34,10 +34,18 @@ internal static class RevisionChecks
         new CredentialService(oldKeys).Save("Groq", "older-key");
         CredentialService.MigrateFromLegacy(oldKeys, newKeys);
         check(new CredentialService(newKeys).Load("Groq") == "current-key", "Credential migration preserves newer saved keys");
-        check(new AppSettings().UpdateFeedUrl == "https://api.github.com/repos/ihrammal/clear-read/releases/latest", "Default update feed uses the owner-approved TextBridge GitHub releases");
+        check(new AppSettings().UpdateFeedUrl == "https://api.github.com/repos/ihrammal/textbridge/releases/latest", "Default update feed uses the owner-approved TextBridge GitHub releases");
         var legacyUpdate = Path.Combine(temp, "empty-update-settings.json");
         File.WriteAllText(legacyUpdate, "{\"UpdateFeedUrl\":\"\"}");
         check(AppSettings.Load(legacyUpdate).UpdateFeedUrl == new AppSettings().UpdateFeedUrl, "Existing empty update feed migrates to the approved public feed");
+        File.WriteAllText(legacyUpdate, "{\"UpdateFeedUrl\":\"https://api.github.com/repos/ihrammal/clear-read/releases/latest\",\"GitHubRepositoryUrl\":\"https://github.com/ihrammal/clear-read\"}");
+        var renamedRepository = AppSettings.Load(legacyUpdate);
+        check(renamedRepository.UpdateFeedUrl == new AppSettings().UpdateFeedUrl && renamedRepository.GitHubRepositoryUrl == new AppSettings().GitHubRepositoryUrl,
+            "Saved Clear Read repository and feed URLs migrate to the canonical TextBridge repository");
+        File.WriteAllText(legacyUpdate, "{\"UpdateFeedUrl\":\"https://updates.example/custom\",\"GitHubRepositoryUrl\":\"https://github.com/example/custom\"}");
+        var customRepository = AppSettings.Load(legacyUpdate);
+        check(customRepository.UpdateFeedUrl == "https://updates.example/custom" && customRepository.GitHubRepositoryUrl == "https://github.com/example/custom",
+            "Repository rename migration preserves custom update feeds and reporting destinations");
         UiLanguage.Configure(new AppSettings { InterfaceLanguage = "ar" });
         var window = new MainWindow();
         var editor = (TextBox)window.FindName("DocumentText");

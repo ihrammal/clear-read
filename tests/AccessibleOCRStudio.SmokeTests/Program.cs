@@ -85,7 +85,7 @@ internal static class Program
         }
         var oldReportSettingsPath = Path.Combine(temp, "old-report-settings.json");
         new AppSettings { GitHubRepositoryUrl = string.Empty }.Save(oldReportSettingsPath);
-        Check(AppSettings.Load(oldReportSettingsPath).GitHubRepositoryUrl == "https://github.com/ihrammal/clear-read", "Existing empty repository settings migrate to the verified reporting destination");
+        Check(AppSettings.Load(oldReportSettingsPath).GitHubRepositoryUrl == "https://github.com/ihrammal/textbridge", "Existing empty repository settings migrate to the verified reporting destination");
         var reportSettings = new AppSettings { GitHubRepositoryUrl = string.Empty, OcrLanguages = "ara+eng+fra", ApiProvider = "Private provider value must not appear" };
         var reportTime = DateTimeOffset.Parse("2026-10-17T10:00:00Z");
         var report = ProblemReportService.Create("مشكلة — Français", "Open a sample", "Recognized text", "Recognition failed", false, reportSettings, reportTime);
@@ -113,7 +113,7 @@ internal static class Program
         var configuredReport = new ReportProblemWindow(new AppSettings());
         ((TextBox)configuredReport.FindName("Summary")).Text = "Synthetic test";
         ((TextBox)configuredReport.FindName("Actual")).Text = "Synthetic behavior";
-        Check(((Button)configuredReport.FindName("GitHubReport")).IsEnabled && new AppSettings().GitHubRepositoryUrl == "https://github.com/ihrammal/clear-read", "Configured TextBridge repository enables GitHub reporting");
+        Check(((Button)configuredReport.FindName("GitHubReport")).IsEnabled && new AppSettings().GitHubRepositoryUrl == "https://github.com/ihrammal/textbridge", "Configured TextBridge repository enables GitHub reporting");
         ((TextBox)configuredReport.FindName("Summary")).Clear(); ((TextBox)configuredReport.FindName("Actual")).Clear(); configuredReport.Close();
         var main = new MainWindow();
         var editor = (TextBox)main.FindName("DocumentText");
@@ -425,7 +425,7 @@ internal static class Program
                     Text(arabic ? "تحديد الكل • قص • نسخ • لصق" : "Select all • Cut • Copy • Paste",boxY+85,29,navy,arabic);
                     Text(arabic ? "تحقّق من النص، وخصوصاً الأرقام." : "Review recognized text, especially numbers.",size.H-185,27,light,arabic);
                 }
-                Text("github.com/ihrammal/clear-read",size.H-112,shortCard ? 27 : 30,light);
+                Text("github.com/ihrammal/textbridge",size.H-112,shortCard ? 27 : 30,light);
                 Text(arabic ? "إعداد إيمان رمال" : "By Iman Rammal",size.H-65,24,mint,arabic);
             }
             var bitmap = new RenderTargetBitmap(size.W,size.H,96,96,PixelFormats.Pbgra32); bitmap.Render(visual);

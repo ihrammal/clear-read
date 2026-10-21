@@ -1,7 +1,8 @@
 # TextBridge automatic update hosting
 
-The owner selected https://api.github.com/repos/ihrammal/clear-read/releases/latest
-as the default public feed on 20 October 2026. Existing blank feed settings migrate
+The canonical feed is https://api.github.com/repos/ihrammal/textbridge/releases/latest.
+The owner selected the original clear-read feed on 20 October 2026 and requested
+the repository rename on 21 October 2026. Existing blank feed settings migrate
 to this address. The app asks permission before downloading; No cancels without
 a download. GitHub stable releases need a matching installer asset and digest.
 A complete real update and installed upgrade still require validation.
@@ -50,8 +51,19 @@ https://jrsoftware.org/ishelp/topic_setupcmdline.htm
 
 ## TextBridge rename (1.0.1)
 
-The repository/feed address stays at ihrammal/clear-read. TextBridge expects
+The canonical repository/feed now uses ihrammal/textbridge. TextBridge expects
 TextBridge-Setup-VERSION.exe. To offer this release to older Clear Read clients,
 also publish the identical installer as ClearRead-Setup-VERSION.exe with its
 GitHub SHA-256 digest. Both names must contain identical bytes. The production
 installer keeps the existing AppId so Windows upgrades the existing app.
+
+## Repository rename — 21 October 2026
+
+The owner requested renaming ihrammal/clear-read to ihrammal/textbridge. The same
+repository, commits, tags, issues and releases were retained. Anonymous checks
+verified both canonical and old update-feed URLs resolve to v1.0.2, and full
+installer downloads through both names match the published SHA-256.
+
+Source defaults and known saved repository/feed URLs now migrate to the canonical
+name. Custom endpoints remain unchanged. Published v1.0.2 binaries are unchanged
+and continue using GitHub's redirect for their original stored/default URLs.

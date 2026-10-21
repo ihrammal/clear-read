@@ -8,9 +8,9 @@ menu level at a time, accessible Cut/Copy actions, and font/colour controls unde
 View > Reading appearance. The owner confirmed the version, Alt/Escape behaviour,
 low-vision controls and hidden status bar before approving publication.
 
-**[Download TextBridge 1.0.2 for Windows (64-bit)](https://github.com/ihrammal/clear-read/releases/download/v1.0.2/TextBridge-Setup-1.0.2.exe)**
+**[Download TextBridge 1.0.2 for Windows (64-bit)](https://github.com/ihrammal/textbridge/releases/download/v1.0.2/TextBridge-Setup-1.0.2.exe)**
 
-[Release page, portable version, source bundles and checksums](https://github.com/ihrammal/clear-read/releases/tag/v1.0.2).
+[Release page, portable version, source bundles and checksums](https://github.com/ihrammal/textbridge/releases/tag/v1.0.2).
 The installer is unsigned. The published installer was downloaded anonymously and
 its SHA-256 verified against the prepared artifact. All 288 local functional checks
 and the matching GitHub Windows build/installer checks passed. See
@@ -51,7 +51,7 @@ permission. Settings > App settings > Updates controls checks at startup.
 These requests never include document contents and are independent of the option
 to prevent document text from being sent to online correction providers.
 
-The update source is the public ihrammal/clear-read GitHub releases feed. Only
+The update source is the public ihrammal/textbridge GitHub releases feed. Only
 newer stable releases with an installer and SHA-256 digest are offered.
 See docs/UPDATE-HOSTING.md for the format and remaining installation validation.
 
