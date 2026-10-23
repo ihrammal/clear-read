@@ -43,6 +43,7 @@ Source: "LICENSE.txt"; DestName: "TextBridge-License.txt"; Flags: dontcopy
 [Types]
 Name: "full"; Description: "PaddleOCR and Windows OCR"
 Name: "compact"; Description: "Windows OCR only"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
 [Components]
 Name: "core"; Description: "TextBridge and Windows OCR support"; Types: full compact; Flags: fixed
 Name: "paddle"; Description: "PaddleOCR offline runtime and language models"; Types: full

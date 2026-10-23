@@ -30,10 +30,18 @@ jobs:
       - name: Restore and build
         shell: pwsh
         run: dotnet build ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj -c Release
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12.14'
-          architecture: 'x64'
+      - name: Prepare pinned Windows Python
+        shell: pwsh
+        run: |
+          # Security-only CPython versions are not available in setup-python's Windows catalog.
+          $archive = Join-Path $env:RUNNER_TEMP 'python312.tar.gz'
+          $destination = Join-Path $env:RUNNER_TEMP 'textbridge-python'
+          Invoke-WebRequest 'https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.12.14%2B20260929-x86_64-pc-windows-msvc-install_only.tar.gz' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne '28728BAF30B65E263F0B25C5A85BE8226E7AB0D212FBADD6A8F0F796139FA804') { throw 'Python archive checksum mismatch.' }
+          New-Item -ItemType Directory -Force $destination | Out-Null
+          tar -xf $archive -C $destination
+          if ($LASTEXITCODE -ne 0) { throw 'Python extraction failed.' }
+          Join-Path $destination 'python' | Out-File $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Prepare offline OCR runtime
         shell: pwsh
         run: ./scripts/setup-runtime.ps1
