@@ -13,7 +13,7 @@ concurrency:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -30,6 +30,10 @@ jobs:
       - name: Restore and build
         shell: pwsh
         run: dotnet build ./src/AccessibleOCRStudio/AccessibleOCRStudio.csproj -c Release
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          architecture: 'x64'
       - name: Prepare offline OCR runtime
         shell: pwsh
         run: ./scripts/setup-runtime.ps1
@@ -46,6 +50,7 @@ jobs:
         run: |
           ./scripts/build-installer.ps1
           ./scripts/test-installer.ps1 -ProductionPackage *>&1 | Tee-Object artifacts/installer-verification-ci.txt
+          ./scripts/test-installer.ps1 -ProductionPackage -WindowsOnly *>&1 | Tee-Object artifacts/windows-ocr-installer-verification-ci.txt
           ./scripts/test-installer.ps1 -ProductionPackage -MachineWide -SkipLaunch *>&1 | Tee-Object artifacts/admin-installer-verification-ci.txt
       - uses: actions/upload-artifact@v4
         with:

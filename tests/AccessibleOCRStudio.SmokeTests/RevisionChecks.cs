@@ -102,9 +102,6 @@ internal static class RevisionChecks
         var html = Path.Combine(temp, "layout.html");
         export.SaveHtmlAsync(html,text,preserveLayout:true).GetAwaiter().GetResult();
         check(File.ReadAllText(html).Contains("white-space:pre-wrap") && WebUtility.HtmlDecode(File.ReadAllText(html)).Contains("École   française"), "Layout-preserving HTML export retains spacing");
-        var psi = new System.Diagnostics.ProcessStartInfo();
-        LocalOcrService.AddRecognitionOptions(psi,new AppSettings { PreserveTextLayout=true });
-        check(psi.ArgumentList.Contains("preserve_interword_spaces=1"), "Optional OCR spacing preservation reaches the OCR engine");
         UpdateChecks(temp,check).GetAwaiter().GetResult();
     }
     private static void Render(Window window,string path,int width,int height)

@@ -1,3 +1,15 @@
+# 1.1.0 — offline PaddleOCR upgrade
+
+- Replace Tesseract with a choice of bundled PP-OCRv5 recognizers or Windows OCR using installed language packs.
+- Add Express/Custom installation, optional Paddle files, desktop/Start menu choices and an optional final app launch.
+- Share searchable PDF export between both engines without requiring Python for Windows-only installs.
+- Keep recognition offline and independent of system Python; include pinned models, page orientation and runtime notices.
+- Preserve logical Arabic text and numerals in searchable PDF extraction.
+- Retain word positions for Latin text and use honest line spans for Arabic review.
+- Handle mixed-language pages, row spacing and native/scanned hybrid PDFs with the new engine.
+- Remove Tesseract-specific Accurate/Fast choices and distinguish empty recognition from completed extraction.
+- Record 24 generated-image comparisons, an independent 15-example Arabic trial and application regression evidence.
+
 # 1.0.2 — manual accessibility review fixes
 
 - Add a persistent View > Show status bar toggle, hidden by default, with on-demand status access and progress announcements.

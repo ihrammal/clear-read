@@ -30,7 +30,7 @@ public static class ProblemReportService
             report.AppendLine($"64-bit process: {Environment.Is64BitProcess}");
             report.AppendLine($".NET: {Environment.Version}");
             report.AppendLine($"Windows UI language: {CultureInfo.CurrentUICulture.Name}");
-            var profile = new[] { "ara", "eng", "fra", "ara+eng", "ara+eng+fra" }.Contains(settings.OcrLanguages) ? settings.OcrLanguages : "Custom (value omitted)";
+            var profile = new[] { "ara", "eng", "fra", "ara+eng", "ara+fra", "eng+fra", "ara+eng+fra" }.Contains(settings.OcrLanguages) ? settings.OcrLanguages : "Custom (value omitted)";
             report.AppendLine($"OCR profile: {profile}");
             report.AppendLine(new RuntimeDiagnosticsService().Check().Summary);
         }

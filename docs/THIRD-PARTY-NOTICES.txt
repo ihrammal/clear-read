@@ -1,12 +1,15 @@
-TextBridge - Third-Party Runtime Notice
+TextBridge 1.1.0 - Third-Party Runtime Notices
 
-The locally prepared development build includes Tesseract OCR 5.5.3.20260724, tessdata_fast Arabic/English/French/orientation models, and Poppler 26.09.0. Tesseract binaries come from https://github.com/tesseract-ocr/tesseract/releases/tag/5.5.3; models come from https://github.com/tesseract-ocr/tessdata_fast; Windows Poppler binaries come from https://github.com/oschwartz10612/poppler-windows/releases/tag/v26.09.0-0.
+Offline OCR uses PaddleOCR 3.7.0, PaddleX 3.7.2 and PaddlePaddle 3.3.1, from the PaddlePaddle projects, under Apache License 2.0. Original project code and bundled models retain their upstream rights. License texts are in paddle/licenses, and Python distribution metadata and accompanying dependency licenses remain under paddle/python/Lib/site-packages.
 
-Tesseract and tessdata model licenses and authorship notices are in licenses/tesseract. Poppler COPYING notices are in licenses/poppler. Bundled native libraries have additional licensing obligations; this notice is not a completed redistribution audit. Runtime binaries are generated local artifacts excluded from source control.
+The bundled PP-OCRv5 detection, Arabic-script, English and Latin recognition models and PP-LCNet page-orientation model come from the official Paddle model host. Exact download URLs and model SHA-256 hashes are recorded in paddle/paddle-models.json. See https://github.com/PaddlePaddle/PaddleOCR and https://www.paddleocr.ai/.
 
-Image preprocessing uses the portable ImageMagick 7.1.2-33 Q8 x64 build from https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.2-33. Its LICENSE.txt and NOTICE.txt are included under licenses/imagemagick. The portable build's native delegates are described in its notices.
+A private CPython 3.12.14 interpreter is included. Its license is at paddle/python/LICENSE.txt. The exact Python dependency inventory is paddle/paddle-requirements.txt. Searchable PDF generation is shared application code and does not require the optional Python runtime. Recognition runs locally and is independent of any system Python installation.
 
-Before a public binary release, verify the exact versions and licenses of every bundled dependency and copy their required notices into the installed application.
+PDF rendering and text extraction use Poppler 26.09.0 from https://github.com/oschwartz10612/poppler-windows/releases/tag/v26.09.0-0. Poppler COPYING notices are in licenses/poppler. Exact unchanged Poppler source and dependency evidence for the previously published runtime are available at https://github.com/ihrammal/textbridge/releases/tag/v1.0.2 under TextBridge-PDF-Source-Evidence-1.0.2.zip.
 
-Additional collected PDF dependency notices and exact-version FreeType notices are bundled under licenses/native/poppler-dependencies. Their origins are recorded in licenses/native/notice-origins.json. Portions of this software are based on the work of the FreeType Team (https://freetype.org). Local Microsoft .NET 8.0.32 runtime notices and SDK notices are preserved under licenses/native/dotnet. These notices do not establish that all native redistribution/source obligations have been completed; UCRT notices have been extracted from the exact hash-verified Microsoft SDK ISO, with provenance preserved in its notice folder. Complete Tesseract/ImageMagick delegate provenance/source work remains open.
+Image preprocessing uses portable ImageMagick 7.1.2-33 Q8 x64 from https://github.com/ImageMagick/ImageMagick/releases/tag/7.1.2-33. Its LICENSE.txt and NOTICE.txt are under licenses/imagemagick. Its unchanged Windows source bundle is available in the TextBridge v1.0.2 release as ImageMagick-7.1.2-33-Windows.7z.
 
+PDF dependency notices and exact-version FreeType notices are under licenses/native/poppler-dependencies. Origins are in licenses/native/notice-origins.json. Portions of this software are based on the work of the FreeType Team (https://freetype.org). Microsoft .NET 8.0.32 runtime notices are under licenses/native/dotnet.
+
+Tesseract is no longer used or included in this version. Historical source audit material may mention it. Original TextBridge code remains free for noncommercial use under the application LICENSE; that restriction does not change the licenses of third-party components.

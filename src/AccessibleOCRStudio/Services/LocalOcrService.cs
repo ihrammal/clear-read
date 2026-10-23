@@ -19,32 +19,18 @@ public sealed class LocalOcrService
     public async Task<RecognitionDocument> RecognizeWithConfidenceAsync(string input, AppSettings settings, IProgress<string>? progress = null)
     {
         var document = new RecognitionDocument();
-        document.PlainText = await RecognizeAsync(input, settings, progress);
-        var ext = Path.GetExtension(input).ToLowerInvariant();
-        if (ext != ".pdf")
+        if (Path.GetExtension(input).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+            document.PlainText = await RecognizeAsync(input, settings, progress);
+        else
         {
+            var prepared = await _preprocessing.PrepareAsync(input, settings);
             try
             {
-                var prepared = await _preprocessing.PrepareAsync(input, settings);
-                try
-                {
-                    var exe = FindExecutable(Path.Combine(AppContext.BaseDirectory, "ocr", "tesseract.exe"), "tesseract");
-                    var psi = NewProcess(exe);
-                    psi.ArgumentList.Add(prepared.Path); psi.ArgumentList.Add("stdout");
-                    psi.ArgumentList.Add("-l"); psi.ArgumentList.Add(settings.OcrLanguages);
-                    AddRecognitionOptions(psi, settings);
-                    psi.ArgumentList.Add("tsv");
-                    var tsv = await RunCheckedAsync(psi, "The OCR confidence pass failed.", true);
-                    foreach (var line in tsv.Split('\n').Skip(1))
-                    {
-                        var c = line.TrimEnd('\r').Split('\t');
-                        if (c.Length < 12 || !int.TryParse(c[0], out var level) || level != 5 || string.IsNullOrWhiteSpace(c[11])) continue;
-                        _ = int.TryParse(c[1], out var page); _ = int.TryParse(c[4], out var lineNo); _ = int.TryParse(c[6], out var left); _ = int.TryParse(c[7], out var top); _ = int.TryParse(c[8], out var width); _ = int.TryParse(c[9], out var height); _ = double.TryParse(c[10], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var conf);
-                        document.Words.Add(new OcrWord(c[11], conf, Math.Max(1,page), lineNo, left, top, width, height));
-                    }
-                }
-                finally { if (prepared.Temporary) try { File.Delete(prepared.Path); } catch { } }
-            } catch { /* Confidence is supplementary; plain OCR remains usable. */ }
+                var result = await new OcrBackendService().RecognizeAsync(prepared.Path, settings);
+                document.PlainText = result.Text;
+                document.Words.AddRange(result.ReviewWords);
+            }
+            finally { if (prepared.Temporary) try { File.Delete(prepared.Path); } catch { } }
         }
         document.Blocks.AddRange(new DocumentStructureService().Analyze(document.PlainText));
         return document;
@@ -192,42 +178,18 @@ public sealed class LocalOcrService
         }
         var pixelWidth = bitmap.PixelWidth;
         var pixelHeight = bitmap.PixelHeight;
-        var exe = FindExecutable(Path.Combine(AppContext.BaseDirectory, "ocr", "tesseract.exe"), "tesseract");
-        var psi = NewProcess(exe);
-        psi.ArgumentList.Add(image); psi.ArgumentList.Add("stdout");
-        psi.ArgumentList.Add("-l"); psi.ArgumentList.Add(settings.OcrLanguages);
-        AddRecognitionOptions(psi, settings);
-        psi.ArgumentList.Add("tsv");
-        var tsv = await RunCheckedAsync(psi, "The OCR engine failed while recognizing scanned PDF content.", true);
-        return PdfHybridTextService.Merge(native, nativeText, tsv, pixelWidth, pixelHeight);
+        // Known PDF rotation has already been corrected above. Prevent the
+        // classifier from changing the canvas used to align native PDF text.
+        var uprightSettings = new AppSettings { OcrLanguages = settings.OcrLanguages, AutoRotate = false };
+        var recognized = await new OcrBackendService().RecognizeAsync(image, uprightSettings);
+        return PdfHybridTextService.Merge(native, nativeText, recognized.ToTsv(), pixelWidth, pixelHeight);
     }
 
     private async Task<string> RecognizeImageAsync(string input, AppSettings settings)
     {
         var prepared = await _preprocessing.PrepareAsync(input, settings);
-        try
-        {
-            var exe = FindExecutable(Path.Combine(AppContext.BaseDirectory, "ocr", "tesseract.exe"), "tesseract");
-            var psi = NewProcess(exe);
-            psi.ArgumentList.Add(prepared.Path); psi.ArgumentList.Add("stdout");
-            psi.ArgumentList.Add("-l"); psi.ArgumentList.Add(settings.OcrLanguages);
-            AddRecognitionOptions(psi, settings);
-            return await RunCheckedAsync(psi, "The OCR engine failed.", true);
-        }
+        try { return (await new OcrBackendService().RecognizeAsync(prepared.Path, settings)).Text; }
         finally { if (prepared.Temporary) try { File.Delete(prepared.Path); } catch { } }
-    }
-
-    internal static void AddRecognitionOptions(ProcessStartInfo psi, AppSettings settings)
-    {
-        psi.ArgumentList.Add("--psm");
-        psi.ArgumentList.Add(settings.AutoRotate ? "1" : settings.OcrMode == "fast" ? "6" : "3");
-        if (settings.PreserveTextLayout)
-        { psi.ArgumentList.Add("-c"); psi.ArgumentList.Add("preserve_interword_spaces=1"); }
-        // Connected Arabic letter shapes can be misclassified as an entire noise row.
-        if (settings.OcrLanguages.Split('+').Contains("ara", StringComparer.OrdinalIgnoreCase))
-        {
-            psi.ArgumentList.Add("-c"); psi.ArgumentList.Add("textord_noise_rejrows=0");
-        }
     }
 
     private static ProcessStartInfo NewProcess(string exe) => new(exe)

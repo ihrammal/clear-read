@@ -24,7 +24,20 @@ public partial class SettingsWindow : Window
         PreserveLayout.IsChecked = _s.PreserveTextLayout; PreferDigital.IsChecked = _s.PreferDigitalPdfText; AutoRotate.IsChecked = _s.AutoRotate; Deskew.IsChecked = _s.Deskew; Grayscale.IsChecked = _s.Grayscale; CheckUpdates.IsChecked = _s.CheckUpdatesOnStartup;
         SelectByTag(InterfaceLanguage, _s.InterfaceLanguage);
         SelectByTag(MessageLanguage, _s.MessageLanguage);
-        SelectByTag(Languages, _s.OcrLanguages); SelectByTag(OcrMode, _s.OcrMode);
+        SelectByTag(Languages, _s.OcrLanguages);
+        foreach(var item in OcrEngine.Items.OfType<ComboBoxItem>())
+            if((string?)item.Tag=="paddle") item.IsEnabled=OcrBackendService.PaddleInstalled;
+        SelectByTag(OcrEngine,OcrBackendService.ResolveEngine(_s));
+        OcrEngine.SelectionChanged+=(_,_)=>UpdateEngineHint();
+        UpdateEngineHint();
+    }
+    private void UpdateEngineHint()
+    {
+        var windows=(OcrEngine.SelectedItem as ComboBoxItem)?.Tag?.ToString()=="windows";
+        AutoRotate.IsEnabled=!windows;
+        EngineHint.Text=windows
+            ? UiLanguage.T("Windows OCR works offline with installed Windows language packs. Recognition confidence is unavailable.")
+            : UiLanguage.T("PaddleOCR works offline with its bundled language models. The first recognition may take longer.");
     }
     private static void SelectByTag(ComboBox box, string value)
     { foreach (var item in box.Items.OfType<ComboBoxItem>()) if ((string?)item.Tag == value) { box.SelectedItem = item; return; } box.SelectedIndex = 0; }
@@ -63,7 +76,8 @@ public partial class SettingsWindow : Window
         _s.PlayStartupSound = StartupSound.IsChecked == true; _s.PlayExitSound = ExitSound.IsChecked == true; _s.ShowWelcomeMessage = WelcomeMessage.IsChecked == true;
         _s.PreserveTextLayout = PreserveLayout.IsChecked == true; _s.PreferDigitalPdfText = PreferDigital.IsChecked == true; _s.AutoRotate = AutoRotate.IsChecked == true; _s.Deskew = Deskew.IsChecked == true; _s.Grayscale = Grayscale.IsChecked == true; _s.CheckUpdatesOnStartup = CheckUpdates.IsChecked == true;
         _s.OcrLanguages = (Languages.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "ara+eng+fra";
-        _s.OcrMode = (OcrMode.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "accurate"; _s.Save(); DialogResult = true;
+        _s.OcrEngine = (OcrEngine.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "auto";
+        _s.Save(); DialogResult = true;
     }
 }
 

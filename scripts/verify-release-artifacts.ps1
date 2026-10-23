@@ -46,7 +46,7 @@ $PublishedFiles = @{}
 Get-ChildItem -LiteralPath $Publish -Recurse -File -Force |
     Where-Object { $_.Name -notlike 'ClearRead.*' -and $_.Name -ne 'ClearRead-LICENSE.txt' } |
     ForEach-Object { $PublishedFiles[[IO.Path]::GetRelativePath($Publish, $_.FullName).Replace('\','/')] = $true }
-foreach ($Required in @('TextBridge.exe','ocr/tesseract.exe','ocr/tessdata/ara.traineddata','ocr/tessdata/eng.traineddata','ocr/tessdata/fra.traineddata','ocr/tessdata/osd.traineddata','pdf/pdftoppm.exe','pdf/pdftotext.exe','image/magick.exe','help/index.html','licenses/TextBridge-LICENSE.txt','licenses/THIRD-PARTY-NOTICES.txt','licenses/native/notice-origins.json','licenses/native/poppler-dependencies/libfreetype6/FTL.TXT')) {
+foreach ($Required in @('TextBridge.exe','paddle/python/python.exe','paddle/worker.py','paddle/models/arabic_PP-OCRv5_mobile_rec/inference.pdiparams','paddle/models/en_PP-OCRv5_mobile_rec/inference.pdiparams','paddle/models/latin_PP-OCRv5_mobile_rec/inference.pdiparams','pdf/pdftoppm.exe','pdf/pdftotext.exe','image/magick.exe','help/index.html','licenses/TextBridge-LICENSE.txt','licenses/THIRD-PARTY-NOTICES.txt','licenses/native/notice-origins.json','licenses/native/poppler-dependencies/libfreetype6/FTL.TXT')) {
     if (-not $PublishedFiles.ContainsKey($Required)) { throw "Publish missing required runtime file: $Required" }
 }
 Test-Archive (Join-Path $Artifacts "TextBridge-$Version-win-x64.zip") $Publish $PublishedFiles
