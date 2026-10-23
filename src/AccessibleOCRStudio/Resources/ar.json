@@ -255,5 +255,16 @@
   "Low vision": "ضعف البصر",
   "Document font size (points)": "حجم خط المستند (بالنقاط)",
   "Current status": "الحالة الحالية",
-  "Preview": "معاينة"
+  "Preview": "معاينة",
+  "Review text to check...": "مراجعة النصوص التي تحتاج إلى تدقيق...",
+  "Next text to check": "النص التالي الذي يحتاج إلى تدقيق",
+  "Previous text to check": "النص السابق الذي يحتاج إلى تدقيق",
+  "No text to check was found. If you edited the text, recognize the document again to refresh review locations.": "لا توجد نصوص للمراجعة. إذا عدّلت النص، أعد التعرف على المستند لتحديث مواضع المراجعة.",
+  "Text to check {0} of {1}: {2}. Recognition confidence: {3} percent.": "نص يحتاج إلى تدقيق {0} من {1}: {2}. ثقة الاستخراج: {3} بالمئة.",
+  "Recognition engine": "محرك استخراج النصوص",
+  "Windows OCR": "استخراج النصوص في Windows",
+  "Windows OCR works offline with installed Windows language packs. Recognition confidence is unavailable.": "يعمل محرك Windows دون إنترنت باستخدام حزم اللغات المثبّتة في النظام. لا يوفّر تقديراً للثقة في الاستخراج.",
+  "PaddleOCR works offline with its bundled language models. The first recognition may take longer.": "يعمل PaddleOCR دون إنترنت باستخدام نماذج اللغات المضمّنة. قد يستغرق الاستخراج الأول وقتاً أطول.",
+  "Arabic + French": "العربية والفرنسية",
+  "English + French": "الإنجليزية والفرنسية"
 }

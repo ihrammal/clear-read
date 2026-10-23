@@ -8,6 +8,23 @@ public partial class App : Application
         EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, new RoutedEventHandler(FitWindowToDisplay));
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         base.OnStartup(e);
+        if(e.Args.Length==4 && e.Args[0]=="--verify-ocr")
+        {
+            try
+            {
+                var settings=new Services.AppSettings { OcrEngine=Services.OcrBackendService.DefaultEngine,OcrLanguages=e.Args[2],Deskew=false,AutoRotate=false };
+                var text=await new Services.LocalOcrService().RecognizeAsync(e.Args[1],settings);
+                await new Services.SearchablePdfService().CreateAsync(e.Args[1],e.Args[3]+".pdf",settings);
+                await System.IO.File.WriteAllTextAsync(e.Args[3],System.Text.Json.JsonSerializer.Serialize(new { engine=Services.OcrBackendService.ResolveEngine(settings),text }));
+                Shutdown(string.IsNullOrWhiteSpace(text)?2:0);
+            }
+            catch(Exception exception)
+            {
+                await System.IO.File.WriteAllTextAsync(e.Args[3],System.Text.Json.JsonSerializer.Serialize(new { error=exception.Message }));
+                Shutdown(1);
+            }
+            return;
+        }
         try
         {
             var settings = Services.AppSettings.Load();

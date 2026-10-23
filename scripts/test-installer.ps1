@@ -1,7 +1,7 @@
-param([switch]$ProductionPackage, [switch]$SkipLaunch, [switch]$MachineWide)
+﻿param([switch]$ProductionPackage, [switch]$SkipLaunch, [switch]$MachineWide, [switch]$WindowsOnly)
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
-$TestRoot = [IO.Path]::GetFullPath((Join-Path $Root '.tools\install-smoke'))
+$TestRoot = [IO.Path]::GetFullPath((Join-Path $Root $(if ($WindowsOnly) { '.tools\install-smoke-windows' } else { '.tools\install-smoke' })))
 $AllowedRoot = [IO.Path]::GetFullPath((Join-Path $Root '.tools')) + [IO.Path]::DirectorySeparatorChar
 if (-not $TestRoot.StartsWith($AllowedRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Installer test target is outside the project tools directory.' }
 if (Test-Path $TestRoot) { throw 'Installer test directory already exists. Inspect the previous test before retrying.' }
@@ -19,7 +19,7 @@ if ($MachineWide) {
 }
 $InstallScope = if ($MachineWide) { '/ALLUSERS' } else { '/CURRENTUSER' }
 $ScopeName = if ($MachineWide) { 'Machine-wide' } else { 'Per-user' }
-$LogPrefix = if ($MachineWide) { 'machine-' } else { '' }
+$LogPrefix = $(if ($WindowsOnly) { 'windows-' } else { '' }) + $(if ($MachineWide) { 'machine-' } else { '' })
 $RegistryPath = if ($MachineWide) { "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\$AppIdentity" } else { $UserRegistryPath }
 if (Test-Path $UserRegistryPath) { throw 'An existing per-user installation has this identity.' }
 if (Test-Path $RegistryPath) { throw 'A previous isolated QA installation exists. Inspect it before retrying.' }
@@ -27,14 +27,20 @@ foreach ($machineRegistry in @("HKLM:\Software\Microsoft\Windows\CurrentVersion\
     if (Test-Path $machineRegistry) { throw 'An installation with this identity already exists. Use the separate QA package.' }
 }
 function Install-App($Log) {
-    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART $InstallScope /NOICONS /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
+    $Components = if ($WindowsOnly) { '' } else { 'paddle' }
+    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART $InstallScope /NOICONS /COMPONENTS=`"$Components`" /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "Installation failed: $($process.ExitCode). See $Log" }
 }
 try {
     Install-App (Join-Path $Root ("artifacts\${LogPrefix}install-test.log"))
-    foreach ($file in @('TextBridge.exe', 'ocr\tesseract.exe', 'pdf\pdftoppm.exe', 'pdf\pdftotext.exe', 'pdf\pdfunite.exe', 'image\magick.exe', 'help\index.html')) {
+    $Required = @('TextBridge.exe','pdf\pdftoppm.exe','pdf\pdftotext.exe','pdf\pdfunite.exe','image\magick.exe','help\index.html')
+    if (-not $WindowsOnly) { $Required += @('paddle\python\python.exe','paddle\worker.py') }
+    foreach ($file in $Required) {
         if (-not (Test-Path (Join-Path $TestRoot $file))) { throw "Installed package is missing $file" }
     }
+    if ($WindowsOnly -and (Test-Path -LiteralPath (Join-Path $TestRoot 'paddle'))) { throw 'Windows-only installation contains the optional Paddle component.' }
+    $ExpectedEngine = if ($WindowsOnly) { 'windows' } else { 'paddle' }
+    if ((Get-Content (Join-Path $TestRoot 'ocr-engine.txt') -Raw).Trim() -ne $ExpectedEngine) { throw 'Installed OCR default differs from selected components.' }
     if (-not (Test-Path $RegistryPath)) { throw 'Installer registration is missing for the requested scope.' }
     Write-Output "PASS: $ScopeName installation includes application, OCR, PDF, preprocessing and help files and correct registration."
     Install-App (Join-Path $Root ("artifacts\${LogPrefix}reinstall-test.log"))
@@ -43,10 +49,40 @@ try {
     foreach ($file in Get-ChildItem $PublishRoot -Recurse -File) {
         if ($file.Name -like 'ClearRead.*' -or $file.Name -eq 'ClearRead-LICENSE.txt') { continue }
         $relative = $file.FullName.Substring($PublishRoot.Length + 1)
+        if ($WindowsOnly -and $relative.StartsWith('paddle\',[StringComparison]::OrdinalIgnoreCase)) { continue }
         $installed = Join-Path $TestRoot $relative
         if (-not (Test-Path $installed) -or (Get-FileHash $file.FullName).Hash -ne (Get-FileHash $installed).Hash) { throw "Installed file does not match the published build: $relative" }
     }
     Write-Output 'PASS: Every installed application file matches the published file hash.'
+    Add-Type -AssemblyName System.Drawing
+    $Fixture=Join-Path $Root '.tools\installed-ocr-fixture.png'
+    $Bitmap=[Drawing.Bitmap]::new(1400,220)
+    $Graphics=[Drawing.Graphics]::FromImage($Bitmap)
+    $Font=[Drawing.Font]::new('Arial',32)
+    try {
+        $Graphics.Clear([Drawing.Color]::White)
+        $Graphics.DrawString('The quick brown fox has 125 documents.',$Font,[Drawing.Brushes]::Black,40,60)
+        $Bitmap.Save($Fixture,[Drawing.Imaging.ImageFormat]::Png)
+    } finally { $Font.Dispose();$Graphics.Dispose();$Bitmap.Dispose() }
+    $OcrReport=Join-Path $Root ("artifacts\${LogPrefix}installed-ocr.json")
+    $VerifyInfo=[Diagnostics.ProcessStartInfo]::new((Join-Path $TestRoot 'TextBridge.exe'))
+    $VerifyInfo.UseShellExecute=$false
+    $VerifyInfo.CreateNoWindow=$true
+    $VerifyInfo.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
+    $VerifyInfo.Arguments="--verify-ocr `"$Fixture`" eng `"$OcrReport`""
+    $VerifyInfo.EnvironmentVariables['PATH']="$env:SystemRoot\System32;$env:SystemRoot"
+    $VerifyInfo.EnvironmentVariables['DOTNET_ROOT']=Join-Path $TestRoot 'no-external-dotnet'
+    $Verification=[Diagnostics.Process]::Start($VerifyInfo)
+    if (-not $Verification.WaitForExit(300000)) { $Verification.Kill();throw 'Installed OCR verification timed out.' }
+    $Recognized=Get-Content -LiteralPath $OcrReport -Raw | ConvertFrom-Json
+    if ($Verification.ExitCode -ne 0) {
+        if ($WindowsOnly -and $env:GITHUB_ACTIONS -eq 'true' -and $Recognized.error -match 'language pack|class not registered') {
+            Write-Output 'SKIP: This runner lacks a Windows OCR language pack; the installed app reports the OS dependency.'
+        } else { throw "Installed OCR failed: $($Recognized.error)" }
+    } elseif ($Recognized.engine -ne $ExpectedEngine -or $Recognized.text -notmatch 'quick brown fox' -or -not (Test-Path "$OcrReport.pdf")) {
+        throw 'Installed OCR or its searchable PDF output differs from the selected engine.'
+    } else { Write-Output "PASS: Installed $ExpectedEngine OCR and searchable PDF export work without external runtimes on PATH." }
+
     if (-not $SkipLaunch) {
     $info = New-Object System.Diagnostics.ProcessStartInfo
     $info.FileName = Join-Path $TestRoot 'TextBridge.exe'

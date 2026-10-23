@@ -5,10 +5,16 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AccessibleOCRStudio\AccessibleOCRStudio.csproj" />
-    <Content Include="..\..\runtime\**\*" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\pdf\**\*" Link="pdf\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\image\**\*" Link="image\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\licenses\poppler\**\*" Link="licenses\poppler\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\licenses\imagemagick\**\*" Link="licenses\imagemagick\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <!-- Keep the Windows API reference pack independent of the .NET servicing version. -->
   <ItemGroup><FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.17763.56" /></ItemGroup>
+  <Target Name="CopyPaddleTests" AfterTargets="Build">
+    <Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\copy-paddle-runtime.ps1&quot; -Destination &quot;$(TargetDir)paddle&quot;" />
+  </Target>
 </Project>
 
 

@@ -27,6 +27,7 @@ internal static class Program
         if (args.Length == 2 && args[0] == "--make-launch-assets")
         {
             MakeLaunchAssets(args[1]);
+            PaddleChecks.MakeScreenshots(args[1]);
             return 0;
         }
         if (args.Length == 2 && args[0] == "--ocr-quality-audit")
@@ -59,9 +60,13 @@ internal static class Program
         Directory.CreateDirectory(temp);
         try
         {
+            if (args.Contains("--paddle-checks-only"))
+            { PaddleChecks.Run(temp, Check); Console.WriteLine($"All {passed} checks passed."); return 0; }
+            if (args.Contains("--windows-checks-only"))
+            { WindowsOcrChecks.Run(temp, Check); Console.WriteLine($"All {passed} checks passed."); return 0; }
             if (args.Contains("--accessibility-checks-only"))
             { AccessibilityChecks.Run(temp, Check); Console.WriteLine($"All {passed} checks passed."); return 0; }
-            if (!args.Contains("--api-checks-only")) { AccessibilityChecks.Run(temp, Check); RevisionChecks.Run(temp, Check); Run(temp); }
+            if (!args.Contains("--api-checks-only")) { AccessibilityChecks.Run(temp, Check); RevisionChecks.Run(temp, Check); Run(temp); PaddleChecks.Run(temp, Check); WindowsOcrChecks.Run(temp, Check); }
             OpenAiChecks.Run(temp, Check);
             ProviderChecks.Run(temp, Check);
             Console.WriteLine($"All {passed} checks passed.");
@@ -160,7 +165,6 @@ internal static class Program
         Check(notificationRaised, "Status element supports UIA notification announcements for milestones");
         Check(DialogGuard.Absorb(MessageBoxButton.OK) == MessageBoxResult.OK && DialogGuard.Absorb(MessageBoxButton.YesNo) == MessageBoxResult.No && DialogGuard.Absorb(MessageBoxButton.YesNoCancel) == MessageBoxResult.Cancel, "Reentrant dialogs are absorbed with non-destructive answers");
         var preferences = new SettingsWindow(new AppSettings());
-        Check(AutomationProperties.GetName((ComboBox)preferences.FindName("OcrMode")) == "Recognition mode", "Recognition mode exposes an accessible name");
         var privacy = new ApiSettingsWindow(new AppSettings());
         ((PasswordBox)privacy.FindName("ApiKey")).Password = "unsaved-test-key";
         ((ComboBox)privacy.FindName("Provider")).SelectedIndex = 2;
@@ -411,12 +415,13 @@ internal static class Program
                         new Typeface(new System.Windows.Media.FontFamily("Segoe UI"), FontStyles.Normal, bold ? FontWeights.Bold : FontWeights.Normal, FontStretches.Normal), font, brush, 1);
                     d.DrawText(f,new Point(rtl ? size.W-80 : 80,y));
                 }
-                Text("TextBridge", shortCard ? 42 : 70, shortCard ? 60 : 76,light,false,true);
+                Text("TextBridge 1.1", shortCard ? 42 : 70, shortCard ? 60 : 76,light,false,true);
                 Text(arabic ? "اقرأ. عدّل. احفظ." : "Read. Edit. Save.",shortCard ? 140 : size.H == 1920 ? 300 : 230,shortCard ? 64 : 76,mint,arabic,true);
                 var start = shortCard ? 245 : size.H == 1920 ? 440 : 375;
                 Text(arabic ? "حوّل الصور والمستندات الممسوحة" : "Turn images and scanned documents",start,shortCard ? 32 : 38,light,arabic);
                 Text(arabic ? "إلى نص يمكنك قراءته وتعديله." : "into text you can read and edit.",start+60,shortCard ? 32 : 38,light,arabic);
                 Text(arabic ? "العربية • الإنجليزية • الفرنسية" : "Arabic • English • French",start+145,shortCard ? 30 : 34,mint,arabic,true);
+                if (!shortCard) Text(arabic ? "اختر PaddleOCR أو محرك Windows" : "Choose PaddleOCR or Windows OCR",start+220,30,light,arabic);
                 if (!shortCard)
                 {
                     var boxY = size.H == 1920 ? 1070 : size.H == 1350 ? 800 : 680;
@@ -430,7 +435,7 @@ internal static class Program
             }
             var bitmap = new RenderTargetBitmap(size.W,size.H,96,96,PixelFormats.Pbgra32); bitmap.Render(visual);
             var encoder = new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            using var stream = File.Create(Path.Combine(output,$"clear-read-{(arabic ? "ar" : "en")}-{size.Name}.png"));encoder.Save(stream);
+            using var stream = File.Create(Path.Combine(output,$"textbridge-{(arabic ? "ar" : "en")}-{size.Name}.png"));encoder.Save(stream);
         }
     }
 

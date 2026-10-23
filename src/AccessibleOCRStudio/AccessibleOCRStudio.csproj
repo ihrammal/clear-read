@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net8.0-windows10.0.17763.0</TargetFramework><UseWPF>true</UseWPF><EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><AssemblyName>TextBridge</AssemblyName>
-    <Version>1.0.2</Version><RuntimeFrameworkVersion>8.0.32</RuntimeFrameworkVersion><Authors>Iman Rammal</Authors><Product>TextBridge</Product>
+    <Version>1.1.0</Version><RuntimeFrameworkVersion>8.0.32</RuntimeFrameworkVersion><Authors>Iman Rammal</Authors><Product>TextBridge</Product>
   </PropertyGroup>
   <ItemGroup><EmbeddedResource Include="Resources\ar.json" /></ItemGroup>
   <ItemGroup><InternalsVisibleTo Include="AccessibleOCRStudio.SmokeTests" /></ItemGroup>
@@ -11,7 +11,10 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.32" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" /></ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\runtime\**\*" Link="%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\pdf\**\*" Link="pdf\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\image\**\*" Link="image\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\licenses\poppler\**\*" Link="licenses\poppler\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\runtime\licenses\imagemagick\**\*" Link="licenses\imagemagick\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\resources\native-notices\**\*" Link="licenses\native\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\LICENSE" Link="licenses\TextBridge-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\docs\THIRD-PARTY-NOTICES.txt" Link="licenses\THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
@@ -20,6 +23,12 @@
   </ItemGroup>
   <!-- Keep the Windows API reference pack independent of the .NET servicing version. -->
   <ItemGroup><FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.17763.56" /></ItemGroup>
+  <Target Name="CopyPaddleBuild" AfterTargets="Build" Condition="Exists('..\..\runtime\paddle\python\python.exe')">
+    <Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\copy-paddle-runtime.ps1&quot; -Destination &quot;$(TargetDir)paddle&quot;" />
+  </Target>
+  <Target Name="CopyPaddlePublish" AfterTargets="Publish">
+    <Exec Command="powershell.exe -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\copy-paddle-runtime.ps1&quot; -Destination &quot;$(PublishDir)paddle&quot;" />
+  </Target>
 </Project>
 
 

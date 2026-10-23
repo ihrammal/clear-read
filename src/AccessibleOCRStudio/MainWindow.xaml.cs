@@ -120,7 +120,7 @@ public partial class MainWindow : Window
             DocumentText.FlowDirection = rtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
             DocumentText.Language = System.Windows.Markup.XmlLanguage.GetLanguage(rtl ? "ar" : _settings.OcrLanguages == "fra" ? "fr" : "en");
             _lowConfidenceIndex = -1;
-            StatusText.Text = ExperienceMessages.Get("complete", _settings.MessageLanguage);
+            StatusText.Text = ExperienceMessages.Get(string.IsNullOrWhiteSpace(DocumentText.Text) ? "noText" : "complete", _settings.MessageLanguage);
             DocumentText.CaretIndex = 0;
             DocumentText.ScrollToHome();
             DocumentText.Focus();
@@ -423,7 +423,7 @@ public partial class MainWindow : Window
 
     private void RuntimeCheck_Click(object sender, RoutedEventArgs e)
     {
-        var r = _diagnostics.Check();
+        var r = _diagnostics.Check(_settings);
         DialogGuard.Show(this, r.Details, "Runtime Diagnostics", MessageBoxButton.OK, r.CoreOcrReady ? MessageBoxImage.Information : MessageBoxImage.Warning);
     }
 
@@ -449,7 +449,7 @@ public partial class MainWindow : Window
         var words = _lastRecognition?.ReviewLocations(DocumentText.Text, _settings.LowConfidenceThreshold);
         if (words is null || words.Count == 0)
         {
-            StatusText.Text = UiLanguage.T("No words to check were found. If you edited the text, recognize the document again to refresh review locations.");
+            StatusText.Text = UiLanguage.T("No text to check was found. If you edited the text, recognize the document again to refresh review locations.");
             return;
         }
         _lowConfidenceIndex = _lowConfidenceIndex < 0
@@ -459,7 +459,7 @@ public partial class MainWindow : Window
         DocumentText.Focus();
         DocumentText.Select(start, word.Text.Length);
         DocumentText.ScrollToLine(DocumentText.GetLineIndexFromCharacterIndex(start));
-        StatusText.Text = UiLanguage.T($"Word to check {_lowConfidenceIndex + 1} of {words.Count}: {word.Text}. Recognition confidence: {word.Confidence:0} percent.");
+        StatusText.Text = UiLanguage.T($"Text to check {_lowConfidenceIndex + 1} of {words.Count}: {word.Text}. Recognition confidence: {word.Confidence:0} percent.");
     }
 
     private void FocusDocument_Click(object sender, RoutedEventArgs e) => DocumentText.Focus();

@@ -1,0 +1,17 @@
+TextBridge 1.1 — Arabic, English and French OCR, offline
+
+I’ve updated TextBridge with PaddleOCR to improve local text recognition, with particular attention to Arabic words and numerals.
+
+Open an image or scanned PDF, recognize the text, review it, then edit or export it to Word, HTML, Markdown or a searchable PDF. The app includes keyboard navigation, screen-reader support, adjustable fonts and reading colours.
+
+Choose Express setup for bundled PaddleOCR, or Custom setup to use Windows OCR and choose your shortcuts. Both work offline. Paddle includes its language models; Windows OCR uses the language packs installed on your PC. Searchable PDF export works with either engine.
+
+Please review names and numbers—OCR can still make mistakes.
+
+Windows 64-bit. Free for noncommercial use.
+By Iman Rammal.
+
+Download and release details:
+https://github.com/ihrammal/textbridge/releases/tag/v1.1.0
+
+#TextBridge #ArabicOCR #Accessibility #Windows

@@ -1,0 +1,94 @@
+{
+  "models": [
+    {
+      "name": "arabic_PP-OCRv5_mobile_rec",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/arabic_PP-OCRv5_mobile_rec_infer.tar",
+      "files": [
+        {
+          "name": "inference.json",
+          "sha256": "d43832804d89c0e18d59f8446a3babd0ef60c44bc335efddac3176caf71d50af"
+        },
+        {
+          "name": "inference.pdiparams",
+          "sha256": "4b4271fd1dd89a40b2056e1a42e58de7c0df2fdcf1a97ca9a8916d7ec45f9143"
+        },
+        {
+          "name": "inference.yml",
+          "sha256": "21368419e6c016c31db55d316d59e11c128e1913e6e6fe10287084710043d3a6"
+        }
+      ]
+    },
+    {
+      "name": "en_PP-OCRv5_mobile_rec",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/en_PP-OCRv5_mobile_rec_infer.tar",
+      "files": [
+        {
+          "name": "inference.json",
+          "sha256": "fd1b6ec722ea841a72d3ba43e527df1d1066d5d7808e0503ee3eec7265188753"
+        },
+        {
+          "name": "inference.pdiparams",
+          "sha256": "3ec8a97ed6cefe8568d3e2ee90bb193299b566a7661aa4fd52d224b96b59f66b"
+        },
+        {
+          "name": "inference.yml",
+          "sha256": "27e91d0582f40168aa218303c76e184bc78fa7a5d105aad0cfbad8458b441067"
+        }
+      ]
+    },
+    {
+      "name": "latin_PP-OCRv5_mobile_rec",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/latin_PP-OCRv5_mobile_rec_infer.tar",
+      "files": [
+        {
+          "name": "inference.json",
+          "sha256": "820b2ee8e5072de5156c3d55124c2b03c82ef278d59f453f857c0789bacb4da1"
+        },
+        {
+          "name": "inference.pdiparams",
+          "sha256": "53cdc8b481a7394bb108f96d0fb3432b0a8f392e22c7d18f06dbb2d42b8b25f9"
+        },
+        {
+          "name": "inference.yml",
+          "sha256": "0bbe984570f597af3638e50bdf2e8276f3ab26a61966096538b3b0d1849f5c84"
+        }
+      ]
+    },
+    {
+      "name": "PP-LCNet_x1_0_doc_ori",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-LCNet_x1_0_doc_ori_infer.tar",
+      "files": [
+        {
+          "name": "inference.json",
+          "sha256": "3580978602f309c3554508dd85d4fe09b73a7e0d80d7f9e63258f5b72c390c69"
+        },
+        {
+          "name": "inference.pdiparams",
+          "sha256": "e8d6e7c5d264507e40e58a655779059d616b20d7441ea22047d829eb3931989c"
+        },
+        {
+          "name": "inference.yml",
+          "sha256": "9e195eb729a8173588cd0e8a852c8b373aa606e79e77b4ac7d8346f5426caf26"
+        }
+      ]
+    },
+    {
+      "name": "PP-OCRv5_mobile_det",
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_infer.tar",
+      "files": [
+        {
+          "name": "inference.json",
+          "sha256": "05feef1acb00aa4cd7362b15f7f501fc4f99d7b1fa73c1c871e0c7b1504b0f5c"
+        },
+        {
+          "name": "inference.pdiparams",
+          "sha256": "afa1820cb16c1fd0dad589d0f8b389139061c1ef6d68019685fd07be997dda5b"
+        },
+        {
+          "name": "inference.yml",
+          "sha256": "98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699"
+        }
+      ]
+    }
+  ]
+}

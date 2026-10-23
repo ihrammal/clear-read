@@ -6,7 +6,7 @@ public sealed class SearchablePdfService
     public async Task CreateAsync(string input, string output, AppSettings settings, IProgress<string>? progress = null)
     {
         var baseDir = AppContext.BaseDirectory;
-        var tess = File.Exists(Path.Combine(baseDir,"ocr","tesseract.exe")) ? Path.Combine(baseDir,"ocr","tesseract.exe") : "tesseract";
+        var paddle = new OcrBackendService();
         var ext = Path.GetExtension(input).ToLowerInvariant();
         var temp = Path.Combine(Path.GetTempPath(), "AccessibleOCRStudio", "pdf-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(temp);
         try
@@ -28,7 +28,8 @@ public sealed class SearchablePdfService
                 var prepared = await new ImagePreprocessingService().PrepareAsync(images[i], settings);
                 try
                 {
-                    await Run(tess,new[]{prepared.Path,stem,"-l",settings.OcrLanguages,"--psm",settings.AutoRotate ? "1" : settings.OcrMode == "fast" ? "6" : "3","pdf"});
+                    var recognized = await paddle.RecognizeAsync(prepared.Path, settings);
+                    await paddle.CreatePdfPageAsync(prepared.Path, stem + ".pdf", recognized);
                     pdfs.Add(stem+".pdf");
                 }
                 finally { if (prepared.Temporary) File.Delete(prepared.Path); }

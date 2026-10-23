@@ -71,7 +71,9 @@ public sealed class PdfHybridTextService
             var word = new Word(columns[11], left, top, right, bottom);
             // Suppress OCR at native text positions, even when OCR spelling differs.
             // Repeated words at other positions must remain in the output.
-            if (nativeWords.Any(existing => Covers(existing, word))) continue;
+            if (nativeWords.Any(existing => Covers(existing, word)) || nativeLines.Any(line =>
+                Covers(new Word(string.Empty, line.Words.Min(w => w.Left), line.Words.Min(w => w.Top),
+                    line.Words.Max(w => w.Right), line.Words.Max(w => w.Bottom)), word))) continue;
             var key = string.Join("/", columns.Skip(1).Take(4));
             if (!groups.TryGetValue(key, out var words)) groups[key] = words = new();
             words.Add(word);

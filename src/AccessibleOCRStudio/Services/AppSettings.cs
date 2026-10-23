@@ -27,6 +27,7 @@ public sealed class AppSettings
     public bool AutoRotate { get; set; } = true;
     public bool Grayscale { get; set; } = false;
     public string OcrLanguages { get; set; } = "ara+eng+fra";
+    public string OcrEngine { get; set; } = "auto";
     public string OcrMode { get; set; } = "accurate";
     public bool OfflineOnlyMode { get; set; } = true;
     public bool AllowApiDocumentContent { get; set; } = false;
@@ -78,7 +79,16 @@ public sealed class AppSettings
                 settings.GitHubRepositoryUrl = new AppSettings().GitHubRepositoryUrl;
             return settings;
         }
-        catch { return new(); }
+        catch
+        {
+            var settings=new AppSettings();
+            if(OcrBackendService.ResolveEngine(settings)=="windows")
+            {
+                var profiles=WindowsOcrService.AvailableProfiles;
+                if(profiles.Count>0)settings.OcrLanguages=string.Join("+",profiles);
+            }
+            return settings;
+        }
     }
     public void Save(string? path = null)
     {
