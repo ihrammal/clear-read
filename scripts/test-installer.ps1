@@ -1,4 +1,4 @@
-param([switch]$ProductionPackage, [switch]$SkipLaunch, [switch]$MachineWide, [switch]$WindowsOnly)
+﻿param([switch]$ProductionPackage, [switch]$SkipLaunch, [switch]$MachineWide, [switch]$WindowsOnly)
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 $TestRoot = [IO.Path]::GetFullPath((Join-Path $Root $(if ($WindowsOnly) { '.tools\install-smoke-windows' } else { '.tools\install-smoke' })))
@@ -27,8 +27,8 @@ foreach ($machineRegistry in @("HKLM:\Software\Microsoft\Windows\CurrentVersion\
     if (Test-Path $machineRegistry) { throw 'An installation with this identity already exists. Use the separate QA package.' }
 }
 function Install-App($Log) {
-    $Components = if ($WindowsOnly) { 'core' } else { 'core,paddle' }
-    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART $InstallScope /NOICONS /COMPONENTS=$Components /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
+    $Components = if ($WindowsOnly) { '' } else { 'paddle' }
+    $process = Start-Process -FilePath $Installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART $InstallScope /NOICONS /COMPONENTS=`"$Components`" /DIR=`"$TestRoot`" /LOG=`"$Log`"" -WindowStyle Hidden -Wait -PassThru
     if ($process.ExitCode -ne 0) { throw "Installation failed: $($process.ExitCode). See $Log" }
 }
 try {

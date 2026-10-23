@@ -37,7 +37,7 @@ DisableProgramGroupPage=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "arabic"; MessagesFile: "compiler:Languages\Arabic.isl"
 [Files]
-Source: "..\publish\*"; DestDir: "{app}"; Excludes: "paddle,paddle\*,ClearRead.*,ClearRead-LICENSE.txt"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: core
+Source: "..\publish\*"; DestDir: "{app}"; Excludes: "paddle,paddle\*,ClearRead.*,ClearRead-LICENSE.txt"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\publish\paddle\*"; DestDir: "{app}\paddle"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: paddle
 Source: "LICENSE.txt"; DestName: "TextBridge-License.txt"; Flags: dontcopy
 [Types]
@@ -45,7 +45,6 @@ Name: "full"; Description: "PaddleOCR and Windows OCR"
 Name: "compact"; Description: "Windows OCR only"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 [Components]
-Name: "core"; Description: "TextBridge and Windows OCR support"; Types: full compact; Flags: fixed
 Name: "paddle"; Description: "PaddleOCR offline runtime and language models"; Types: full
 [Icons]
 Name: "{group}\{#MyAppShortcutName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startmenu
@@ -167,13 +166,13 @@ begin
   if WizardSilent then exit;
   if (CurPageID = ModePage.ID) and ModePage.Values[0] then
   begin
-    WizardSelectComponents('core,paddle');
+    WizardSelectComponents('paddle');
     WizardSelectTasks('desktopicon,startmenu');
   end;
   if CurPageID = EnginePage.ID then
   begin
-    if EnginePage.Values[0] then WizardSelectComponents('core,paddle')
-    else WizardSelectComponents('core');
+    if EnginePage.Values[0] then WizardSelectComponents('paddle')
+    else WizardSelectComponents('');
   end;
 end;
 
